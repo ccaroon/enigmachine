@@ -2,11 +2,11 @@ package enigma
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func LetterToIdx(letter byte) int {
+func LetterToIdx(letter byte) byte {
 	idx := letter - byte('A')
-	return int(idx)
+	return idx
 }
 
-func IdxToLetter(idx int) byte {
+func IdxToLetter(idx byte) byte {
 	return byte(idx)%26 + byte('A')
 }
