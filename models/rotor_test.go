@@ -10,9 +10,8 @@ import (
 var _ = Describe("Rotor", func() {
 
 	It("Should Invert the Wiring On Init", func() {
-		rotor := models.NewRotor("I", "ZYXWVUTSRQPONMLKJIHGFEDCBA")
-
-		Expect(rotor.Inverse).To(Equal("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+		rotor := models.GetRotor("I")
+		Expect((rotor.Inverse)).To(Equal("UWYGADFPVZBECKMTHXSLRINQOJ"))
 	})
 
 })

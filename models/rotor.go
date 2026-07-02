@@ -12,9 +12,8 @@ type Rotor struct {
 var (
 	presetRotors [6]Rotor = [6]Rotor{
 		Rotor{
-			Id:     "0",
-			Wiring: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-			// Wiring:   "CRAIG",
+			Id:       "0",
+			Wiring:   "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 			position: 0,
 		},
 		Rotor{
@@ -86,7 +85,7 @@ func (rotor *Rotor) Initialize() {
 		// fmt.Printf("%d -> %s\n", idx, string(letter))
 
 		newIdx := LetterToIdx(byte(letter))
-		newLtr := IdxToLetter(byte(idx))
+		newLtr := IdxToLetter(idx)
 		// fmt.Printf("%d -> %s | %d -> %s\n", idx, string(letter), newIdx, string(newLtr))
 		inverse[newIdx] = newLtr
 	}

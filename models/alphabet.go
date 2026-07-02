@@ -2,10 +2,11 @@ package models
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func LetterToIdx(letter byte) byte {
-	return letter - byte('A')
+func LetterToIdx(letter byte) int {
+	idx := letter - byte('A')
+	return int(idx)
 }
 
-func IdxToLetter(idx byte) byte {
-	return idx%26 + byte('A')
+func IdxToLetter(idx int) byte {
+	return byte(idx)%26 + byte('A')
 }
