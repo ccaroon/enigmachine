@@ -1,4 +1,4 @@
-module github.com/ccaroon/enigma
+module github.com/ccaroon/enigmachine
 
 go 1.25.5
 

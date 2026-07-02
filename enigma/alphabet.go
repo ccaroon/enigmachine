@@ -1,4 +1,4 @@
-package models
+package enigma
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 

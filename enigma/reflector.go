@@ -1,4 +1,4 @@
-package models
+package enigma
 
 type Reflector struct {
 	id     string
