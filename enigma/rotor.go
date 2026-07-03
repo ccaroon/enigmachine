@@ -1,13 +1,13 @@
 package enigma
 
 import (
-	"fmt"
+	"strings"
 )
 
 type Rotor struct {
-	Id       string
-	Wiring   string
-	Inverse  string
+	Id     string
+	Wiring string
+	// Inverse  string
 	position byte
 }
 
@@ -29,7 +29,7 @@ func NewRotor(id string, wiring string, topLetter byte) Rotor {
 	}
 
 	rotor.SetTopLetter(topLetter)
-	rotor.Initialize()
+	// rotor.Initialize()
 
 	return rotor
 }
@@ -55,16 +55,16 @@ func GetRotor(Id string) Rotor {
 	return rotor
 }
 
-func (rotor *Rotor) Initialize() {
-	// Get Inverse Wiring
-	inverse := make([]byte, 26)
-	for idx, letter := range rotor.Wiring {
-		newIdx := LetterToIdx(byte(letter))
-		newLtr := IdxToLetter(byte(idx))
-		inverse[newIdx] = newLtr
-	}
-	rotor.Inverse = string(inverse)
-}
+// func (rotor *Rotor) Initialize() {
+// 	// Get Inverse Wiring
+// 	inverse := make([]byte, 26)
+// 	for idx, letter := range rotor.Wiring {
+// 		newIdx := LetterToIdx(byte(letter))
+// 		newLtr := IdxToLetter(byte(idx))
+// 		inverse[newIdx] = newLtr
+// 	}
+// 	rotor.Inverse = string(inverse)
+// }
 
 func (rotor *Rotor) SetTopLetter(letter byte) {
 	rotor.position = LetterToIdx(letter)
@@ -72,32 +72,19 @@ func (rotor *Rotor) SetTopLetter(letter byte) {
 
 // Right to Left
 func (rotor *Rotor) Forward(letter byte) byte {
-	// (* [map_r_to_l wiring top_letter input_pos] is the left-hand output position
-	//   - at which current would appear when current enters at right-hand input
-	//   - position [input_pos] to a rotor whose wiring specification is given by
-	//   - [wiring].  The orientation of the rotor is given by [top_letter],
-	//   - which is the top letter appearing to the operator in the rotor's
-	//   - present orientation.
-	//   - requires:
-	//   - - [wiring] is a valid wiring specification.
-	//   - - [top_letter] is in 'A'..'Z'
-	//   - - [input_pos] is in 0..25
-	//     *)
-	//
-	// val map_r_to_l : string -> char -> int -> int
-	// ----
-	// "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-	idx := (LetterToIdx(letter) + rotor.position) % 26
+	pos := (LetterToIdx(letter) + rotor.position) % 26
+	wLetter := rotor.Wiring[pos]
 
-	return rotor.Wiring[idx]
+	idx := ((26 - rotor.position) + LetterToIdx(wLetter)) % 26
+	return IdxToLetter(idx)
 }
 
 // Left to Right
 func (rotor *Rotor) Reverse(letter byte) byte {
-	return 'A'
-}
+	pos := (LetterToIdx(letter) + rotor.position) % 26
+	wLetter := IdxToLetter(pos)
 
-func (rotor *Rotor) Debug() {
-	fmt.Printf("W: %s\n", rotor.Wiring)
-	fmt.Printf("I: %s\n", rotor.Inverse)
+	idx := strings.IndexByte(rotor.Wiring, wLetter)
+	return IdxToLetter(byte(idx))
+
 }
