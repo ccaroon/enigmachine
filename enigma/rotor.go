@@ -5,66 +5,46 @@ import (
 )
 
 type Rotor struct {
-	Id     string
-	Wiring string
-	// Inverse  string
+	id       string
+	wiring   string
 	position byte
 }
 
-var (
-	presetRotors [6]Rotor = [6]Rotor{
-		NewRotor("0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 'A'),
-		NewRotor("I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", 'A'),
-		NewRotor("II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", 'A'),
-		NewRotor("III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", 'A'),
-		NewRotor("IV", "ESOVPZJAYQUIRHXLNFTGKDCMWB", 'A'),
-		NewRotor("V", "VZBRGITYUPSDNHLXAWMJQOFECK", 'A'),
-	}
-)
-
-func NewRotor(id string, wiring string, topLetter byte) Rotor {
-	rotor := Rotor{
-		Id:     id,
-		Wiring: wiring,
+func NewRotor(id string, wiring string, topLetter byte) *Rotor {
+	rotor := &Rotor{
+		id:     id,
+		wiring: wiring,
 	}
 
 	rotor.SetTopLetter(topLetter)
-	// rotor.Initialize()
 
 	return rotor
 }
 
-func GetRotor(Id string) Rotor {
-	var rotor Rotor
+func GetRotor(id string) *Rotor {
+	var rotor *Rotor
 
-	switch Id {
+	switch id {
 	case "0":
-		rotor = presetRotors[0]
+		rotor = NewRotor("0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 'A')
 	case "I":
-		rotor = presetRotors[1]
+		rotor = NewRotor("I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", 'A')
 	case "II":
-		rotor = presetRotors[2]
+		rotor = NewRotor("II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", 'A')
 	case "III":
-		rotor = presetRotors[3]
+		rotor = NewRotor("III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", 'A')
 	case "IV":
-		rotor = presetRotors[4]
+		rotor = NewRotor("IV", "ESOVPZJAYQUIRHXLNFTGKDCMWB", 'A')
 	case "V":
-		rotor = presetRotors[5]
+		rotor = NewRotor("V", "VZBRGITYUPSDNHLXAWMJQOFECK", 'A')
 	}
 
 	return rotor
 }
 
-// func (rotor *Rotor) Initialize() {
-// 	// Get Inverse Wiring
-// 	inverse := make([]byte, 26)
-// 	for idx, letter := range rotor.Wiring {
-// 		newIdx := LetterToIdx(byte(letter))
-// 		newLtr := IdxToLetter(byte(idx))
-// 		inverse[newIdx] = newLtr
-// 	}
-// 	rotor.Inverse = string(inverse)
-// }
+func (rotor *Rotor) Index(idx byte) byte {
+	return rotor.wiring[idx]
+}
 
 func (rotor *Rotor) SetTopLetter(letter byte) {
 	rotor.position = LetterToIdx(letter)
@@ -72,19 +52,16 @@ func (rotor *Rotor) SetTopLetter(letter byte) {
 
 // Right to Left
 func (rotor *Rotor) Forward(letter byte) byte {
-	pos := (LetterToIdx(letter) + rotor.position) % 26
-	wLetter := rotor.Wiring[pos]
+	lIdx := LetterToIdx(letter)
+	inPos := (lIdx + (26 - rotor.position)) % 26
 
-	idx := ((26 - rotor.position) + LetterToIdx(wLetter)) % 26
-	return IdxToLetter(idx)
+	return rotor.wiring[inPos]
 }
 
 // Left to Right
 func (rotor *Rotor) Reverse(letter byte) byte {
-	pos := (LetterToIdx(letter) + rotor.position) % 26
-	wLetter := IdxToLetter(pos)
+	lIdx := strings.IndexByte(rotor.wiring, letter)
+	outPos := (byte(lIdx) + rotor.position) % 26
 
-	idx := strings.IndexByte(rotor.Wiring, wLetter)
-	return IdxToLetter(byte(idx))
-
+	return IdxToLetter(outPos)
 }

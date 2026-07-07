@@ -356,22 +356,22 @@ Next, let's associate each of those numbers with its index in the list:
   4    11
 ...   ...
 ```
-Finally, think of that table as defining a function \\(w\\), such that \\(w(0) =
-4\\), \\(w(1) = 10\\), \\(w(2) = 12\\), \\(w(3) = 5\\), \\(w(4) = 11\\), etc.
+Finally, think of that table as defining a function (w), such that (w(0) =
+4), (w(1) = 10), (w(2) = 12), (w(3) = 5), (w(4) = 11), etc.
 
-The function \\(w\\) we have thus constructed is what the wiring specification
+The function (w) we have thus constructed is what the wiring specification
 really denotes. A rotor has a left side and a right side, and each side has 26
 *contacts* from which electrical current can enter or leave the rotor. If
-current enters the rotor from the right side at contact \\(i\\), it leaves the
-rotor from the left side at contact \\(w(i)\\).  And if current enters the rotor
-from the left side at contact \\(j\\), it leaves the rotor from the right side
-at contact \\(w^{-1}(j)\\), where \\(w^{-1}\\) denotes the inverse of \\(w\\).
+current enters the rotor from the right side at contact (i), it leaves the
+rotor from the left side at contact (w(i)).  And if current enters the rotor
+from the left side at contact (j), it leaves the rotor from the right side
+at contact (w^{-1}(j)), where (w^{-1}) denotes the inverse of (w).
 
 **Rotor orientation.**
 There are 26 fixed *positions* at which current can enter a rotor. (For example,
 if the plugboard is empty, typing 'A' causes current to enter the right-most
-rotor at position 0, 'B' at 1, etc.) But current entering at position \\(i\\)
-does not necessarily connect with contact \\(i\\) on the rotor, because rotors
+rotor at position 0, 'B' at 1, etc.) But current entering at position (i)
+does not necessarily connect with contact (i) on the rotor, because rotors
 turn around the spindle.  That rotation causes an *offset* between the positions
 and the contacts.
 
@@ -419,7 +419,7 @@ right to left, and current enters at position 0:
   rotor, because the rotor's offset is 0.
 
 * Current entering right-hand contact 0 flows to left-hand contact 4,
-  because \\(w(0) = 4\\) for this rotor's wiring specification.
+  because (w(0) = 4) for this rotor's wiring specification.
 
 * Current exiting left-hand contact 4 flows to left-hand position 4, because the
   rotor's offset is 0.
@@ -431,7 +431,7 @@ Example 1 change?
   because the rotor's offset is now 1.
 
 * Current entering right-hand contact 1 flows to left-hand contact 10,
-  because \\(w(1) = 10\\).
+  because (w(1) = 10).
 
 * Current exiting left-hand contact 10 flows to left-hand position 9, because
   the rotor's offset is 1.
@@ -443,7 +443,7 @@ right.
   rotor, because the rotor's offset is 0.
 
 * Current entering left-hand contact 0 flows to right-hand contact 20,
-  because \\(w^{-1}(0) = 20\\) for this rotor's wiring specification.
+  because (w^{-1}(0) = 20) for this rotor's wiring specification.
   (That's a fact we haven't previously established, but you should be able
   to work it out yourself from the fact that 'A', whose index in the alphabet
   is 0, appears at position 20 in the wiring specification.)
@@ -458,7 +458,7 @@ left to right.
   rotor, because the rotor's offset is 1.
 
 * Current entering left-hand contact 1 flows to right-hand contact 22,
-  because \\(w^{-1}(1) = 22\\) for this rotor's wiring specification.
+  because (w^{-1}(1) = 22) for this rotor's wiring specification.
 
 * Current exiting right-hand contact 22 flows to right-hand position 21, because
   the rotor's offset is 1.
@@ -607,19 +607,19 @@ your particular concern about it might be.
 ## Part 3: Reflector <a name="reflector"></a>
 
 The wiring of a reflector is specified with the same kind of 26-character string
-as a rotor, and that string is used to define a function \\(w\\) as before.
+as a rotor, and that string is used to define a function (w) as before.
 Unlike rotors, the reflector does not rotate, so we don't have to worry about
 the orientation or offset of the reflector.  Also, current flows only one
 direction through a reflector, so we don't have to worry about right-to-left vs.
-left-to-right. When current enters a reflector at input position \\(i\\), it
-exits at output position \\(w(i)\\).
+left-to-right. When current enters a reflector at input position (i), it
+exits at output position w(i).
 
-<span style="color:green;">[ADDED 09/08/17]:
+
 A *valid reflector specification* is a valid wiring specification that meets
-one additional criterion:  if \\(w(i) = j\\) then
-\\(w(j) = i\\).  It is this property that makes the wiring a reflection, in
-the sense that it swaps \\(i\\) and \\(j\\).
-</span>
+one additional criterion:  if (w(i) = j) then
+(w(j) = i).  It is this property that makes the wiring a reflection, in
+the sense that it swaps (i) and (j).
+
 
 The wiring specifications of the standard reflectors B and C from the 1930
 Enigma I are as follows:
@@ -629,7 +629,7 @@ reflector C: FVPJIAOYEDRZXWGCTKUQSBNMHL
 ```
 
 For example, current entering reflector B at input position 0 would exit at
-output position 24, because \\(w(0) = 24\\) for that reflector.
+output position 24, because (w(0) = 24) for that reflector.
 
 Write a function `map_refl` that computes how a reflector maps current.
 Here is a specification for the function:
