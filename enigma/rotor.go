@@ -1,8 +1,6 @@
 package enigma
 
-import (
-	"strings"
-)
+import "strings"
 
 type Rotor struct {
 	id       string
@@ -42,6 +40,10 @@ func GetRotor(id string) *Rotor {
 	return rotor
 }
 
+func (rotor *Rotor) Id() string {
+	return rotor.id
+}
+
 func (rotor *Rotor) Index(idx byte) byte {
 	return rotor.wiring[idx]
 }
@@ -53,15 +55,21 @@ func (rotor *Rotor) SetTopLetter(letter byte) {
 // Right to Left
 func (rotor *Rotor) Forward(letter byte) byte {
 	lIdx := LetterToIdx(letter)
-	inPos := (lIdx + (26 - rotor.position)) % 26
+	inPos := (lIdx + (26 + rotor.position)) % 26
 
 	return rotor.wiring[inPos]
 }
 
 // Left to Right
+//
+// -	    ABCDEFGHIJKLMNOPQRSTUVWXYZ
+// -	   EKMFLGDQVZNTOWYHXUSPAIBRCJ
 func (rotor *Rotor) Reverse(letter byte) byte {
-	lIdx := strings.IndexByte(rotor.wiring, letter)
-	outPos := (byte(lIdx) + rotor.position) % 26
+	lIdx := strings.IndexByte(rotor.wiring, letter) // 20
+	//            (20      - 1) % 26 == 19
+	outPos := (byte(lIdx) - rotor.position) % 26
 
 	return IdxToLetter(outPos)
 }
+
+// ---

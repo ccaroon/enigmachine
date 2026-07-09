@@ -21,6 +21,21 @@ var _ = Describe("Plugboard", func() {
 	})
 
 	Context("Creation", func() {
+
+		It("Should be able to create an 'empty' plugboard", func() {
+			pb2 := enigma.NewPlugboard([]byte{})
+
+			Expect(pb2.NumCables()).To(Equal(0))
+			Expect(pb2.GetCable(0)).To(BeNil())
+			Expect(pb2.Map('A')).To(Equal(byte('A')))
+			Expect(pb2.Map('B')).To(Equal(byte('B')))
+			Expect(pb2.Map('C')).To(Equal(byte('C')))
+			Expect(pb2.Map('X')).To(Equal(byte('X')))
+			Expect(pb2.Map('Y')).To(Equal(byte('Y')))
+			Expect(pb2.Map('Z')).To(Equal(byte('Z')))
+
+		})
+
 		It("Should create a valid plugboard given valid inputs", func() {
 			Expect(pb.NumCables()).To(Equal(4))
 
