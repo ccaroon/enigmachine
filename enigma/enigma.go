@@ -39,13 +39,13 @@ func (enigma *Enigma) EncipherLetter(inLetter byte) byte {
 	outLetter = enigma.reflector.Reflect(outLetter)
 
 	// ### REVERSE (left-to-right) ###
-	// // ROTORS
-	// for idx := 0; idx < len(enigma.rotors); idx++ {
-	// 	rotor := enigma.rotors[idx]
-	// 	outLetter = rotor.Reverse(outLetter)
-	// }
-	// // PLUGBOARD
-	// outLetter = enigma.plugboard.Map(outLetter)
+	// ROTORS
+	for idx := 0; idx < len(enigma.rotors); idx++ {
+		rotor := enigma.rotors[idx]
+		outLetter = rotor.Reverse(outLetter)
+	}
+	// PLUGBOARD
+	outLetter = enigma.plugboard.Map(outLetter)
 
 	return outLetter
 }

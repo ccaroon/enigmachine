@@ -1,6 +1,8 @@
 package enigma
 
-import "strings"
+import (
+	"strings"
+)
 
 type Rotor struct {
 	id       string
@@ -24,7 +26,8 @@ func GetRotor(id string) *Rotor {
 
 	switch id {
 	case "0":
-		rotor = NewRotor("0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 'A')
+		// Identity Rotor
+		rotor = NewRotor("0", ALPHABET, 'A')
 	case "I":
 		rotor = NewRotor("I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", 'A')
 	case "II":
@@ -44,12 +47,23 @@ func (rotor *Rotor) Id() string {
 	return rotor.id
 }
 
-func (rotor *Rotor) Index(idx byte) byte {
-	return rotor.wiring[idx]
+func (rotor *Rotor) Wiring() string {
+	// Rotor Wiring adjusted for position/offset
+	adjWiring := rotor.wiring[rotor.position:] + rotor.wiring[0:rotor.position]
+
+	return adjWiring
 }
+
+// func (rotor *Rotor) Index(idx byte) byte {
+// 	return rotor.wiring[idx]
+// }
 
 func (rotor *Rotor) SetTopLetter(letter byte) {
 	rotor.position = LetterToIdx(letter)
+}
+
+func (rotor *Rotor) GetTopLetter() byte {
+	return IdxToLetter(rotor.position)
 }
 
 // Right to Left
@@ -62,14 +76,18 @@ func (rotor *Rotor) Forward(letter byte) byte {
 
 // Left to Right
 //
-// -	    ABCDEFGHIJKLMNOPQRSTUVWXYZ
-// -	   EKMFLGDQVZNTOWYHXUSPAIBRCJ
+// -	             ABCDEFGHIJKLMNOPQRSTUVWXYZ
+// -	   AJDKSIRUXBLHWTMCQGZNPYFVOE
 func (rotor *Rotor) Reverse(letter byte) byte {
-	lIdx := strings.IndexByte(rotor.wiring, letter) // 20
-	//            (20      - 1) % 26 == 19
-	outPos := (byte(lIdx) - rotor.position) % 26
+	lIdx := strings.IndexByte(rotor.wiring, letter)
+	outPos := (byte(lIdx) + (26 - rotor.position)) % 26
 
-	return IdxToLetter(outPos)
+	// fmt.Printf("\n%c) (%d + %d) %% 26 => %d\n", letter, lIdx, (26 - rotor.position), outPos)
+
+	outLetter := IdxToLetter(outPos)
+	// fmt.Printf("%d -> %c\n", outPos, outLetter)
+
+	return outLetter
 }
 
 // ---

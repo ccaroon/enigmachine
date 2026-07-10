@@ -7,117 +7,189 @@ import (
 	"github.com/ccaroon/enigmachine/enigma"
 )
 
+func inverseWiring(wiring string) string {
+	inverse := make([]byte, 26)
+	for idx, letter := range wiring {
+		newIdx := enigma.LetterToIdx(byte(letter))
+		newLtr := enigma.IdxToLetter(byte(idx))
+		inverse[newIdx] = newLtr
+	}
+
+	return string(inverse)
+}
+
+func fullTest(rotor *enigma.Rotor) {
+	expectedFwd := rotor.Wiring()
+	for idx, letter := range enigma.ALPHABET {
+		outLetter := byte(expectedFwd[idx])
+		Expect(rotor.Forward(byte(letter))).To(Equal(outLetter))
+	}
+
+	expectedRev := inverseWiring(expectedFwd)
+	for idx, letter := range enigma.ALPHABET {
+		outLetter := byte(expectedRev[idx])
+		Expect(rotor.Reverse(byte(letter))).To(Equal(outLetter))
+	}
+}
+
 var _ = Describe("Rotor", func() {
 
 	It("Should pass the Identity Test", func() {
-		rotor := enigma.NewRotor("0", enigma.ALPHABET, 'A')
-
-		for _, letter := range enigma.ALPHABET {
-			Expect(rotor.Forward(byte(letter))).To(Equal(byte(letter)))
-		}
+		rotor := enigma.GetRotor("0")
+		fullTest(rotor)
 	})
 
-	It("Rotor I: Forward -> Top Letter 'A'", func() {
+	It("Can Set Top Letter", func() {
+		rotor := enigma.GetRotor("0")
+
+		rotor.SetTopLetter('A')
+		Expect(rotor.Forward('A')).To(Equal(byte('A')))
+
+		rotor.SetTopLetter('B')
+		Expect(rotor.Forward('A')).To(Equal(byte('B')))
+
+		rotor.SetTopLetter('C')
+		Expect(rotor.Forward('A')).To(Equal(byte('C')))
+
+		rotor.SetTopLetter('J')
+		Expect(rotor.Forward('A')).To(Equal(byte('J')))
+
+		rotor.SetTopLetter('Q')
+		Expect(rotor.Forward('A')).To(Equal(byte('Q')))
+
+		rotor.SetTopLetter('X')
+		Expect(rotor.Forward('A')).To(Equal(byte('X')))
+	})
+
+	It("Rotor I: Top Letter 'A'", func() {
 		rotor := enigma.GetRotor("I")
-
-		Expect(rotor.Forward('A')).To(Equal(byte('E')))
-		Expect(rotor.Forward('B')).To(Equal(byte('K')))
-		// ...
-		Expect(rotor.Forward('Y')).To(Equal(byte('C')))
-		Expect(rotor.Forward('Z')).To(Equal(byte('J')))
+		fullTest(rotor)
 	})
 
-	// 	It("Rotor I: Forward -> Top Letter 'B'", func() {
-	// 		rotor := enigma.GetRotor("I")
-	// 		rotor.SetTopLetter('B')
+	It("Rotor II: Top Letter 'A'", func() {
+		rotor := enigma.GetRotor("II")
+		fullTest(rotor)
+	})
 
-	// 		Expect(rotor.Forward('A')).To(Equal(byte('K')))
-	// 		Expect(rotor.Forward('B')).To(Equal(byte('M')))
-	// 		// ...
-	// 		Expect(rotor.Forward('Y')).To(Equal(byte('J')))
-	// 		Expect(rotor.Forward('Z')).To(Equal(byte('E')))
-	// 	})
+	It("Rotor III: Top Letter 'A'", func() {
+		rotor := enigma.GetRotor("III")
+		fullTest(rotor)
+	})
 
-	// 	It("Roto I: Reverse -> Top Letter 'A'", func() {
-	// 		rotor := enigma.GetRotor("I")
+	It("Rotor IV: Top Letter 'A'", func() {
+		rotor := enigma.GetRotor("IV")
+		fullTest(rotor)
+	})
 
-	// 		Expect(rotor.Reverse('A')).To(Equal(byte('U')))
-	// 		Expect(rotor.Reverse('F')).To(Equal(byte('D')))
-	// 		// ...
-	// 		Expect(rotor.Reverse('Y')).To(Equal(byte('O')))
-	// 		Expect(rotor.Reverse('Z')).To(Equal(byte('J')))
-	// 	})
+	It("Rotor V: Top Letter 'A'", func() {
+		rotor := enigma.GetRotor("V")
+		fullTest(rotor)
+	})
 
-	// 	It("Roto I: Reverse -> Top Letter 'B'", func() {
-	// 		rotor := enigma.GetRotor("I")
-	// 		rotor.SetTopLetter('B')
+	It("Rotor I: Top Letter 'B'", func() {
+		rotor := enigma.GetRotor("I")
+		rotor.SetTopLetter('B')
 
-	// 		Expect(rotor.Reverse('A')).To(Equal(byte('T')))
-	// 		Expect(rotor.Reverse('F')).To(Equal(byte('C')))
-	// 		// ...
-	// 		Expect(rotor.Reverse('Y')).To(Equal(byte('N')))
-	// 		Expect(rotor.Reverse('Z')).To(Equal(byte('I')))
-	// 	})
+		fullTest(rotor)
+	})
 
-	// 	It("Top Letter Test", func() {
-	// 		// I:    ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// 		// O:      BACDEFGHIJKLMNOPQRSTUVWXYZ
-	// 		rotor := enigma.NewRotor("X", "BACDEFGHIJKLMNOPQRSTUVWXYZ", 'A')
+	It("Top Letter Test", func() {
+		// I:    ABCDEFGHIJKLMNOPQRSTUVWXYZ
+		// O:  BACDEFGHIJKLMNOPQRSTUVWXYZ
+		rotor := enigma.NewRotor("X", "BACDEFGHIJKLMNOPQRSTUVWXYZ", 'A')
 
-	// 		Expect(rotor.Forward('A')).To(Equal(byte('B')))
-	// 		Expect(rotor.Reverse('A')).To(Equal(byte('B')))
+		Expect(rotor.Forward('A')).To(Equal(byte('B')))
+		Expect(rotor.Reverse('A')).To(Equal(byte('B')))
 
-	// 		rotor.SetTopLetter('B')
-	// 		Expect(rotor.Forward('A')).To(Equal(byte('A')))
-	// 		Expect(rotor.Reverse('A')).To(Equal(byte('C')))
+		rotor.SetTopLetter('B')
+		Expect(rotor.Forward('A')).To(Equal(byte('A')))
+		Expect(rotor.Reverse('A')).To(Equal(byte('A')))
 
-	// 		rotor.SetTopLetter('C')
-	// 		Expect(rotor.Forward('A')).To(Equal(byte('C')))
-	// 		Expect(rotor.Reverse('A')).To(Equal(byte('D')))
-	// 	})
+		rotor.SetTopLetter('C')
+		Expect(rotor.Forward('A')).To(Equal(byte('C')))
+		Expect(rotor.Reverse('A')).To(Equal(byte('Z')))
+	})
 
-	// 	// map_r_to_l rotor_III 'O' `14` should be `17`.
-	// 	It("Rotor III: Forward 'O' 14 -> 17", func() {
-	// 		// ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// 		//               |
-	// 		// YEIWGAKMUSQOBDFHJLCPRTXVZN
-	// 		rotor := enigma.GetRotor("III")
-	// 		rotor.SetTopLetter('O')
+	// map_r_to_l rotor_III 'O' `14` should be `17`.
+	It("Rotor III: Top Letter 'O' // Forward // Pos 14 -> 17", func() {
+		// ABCDEFGHIJKLMNOPQRSTUVWXYZ
+		//               |
+		// YEIWGAKMUSQOBDFHJLCPRTXVZN
+		rotor := enigma.GetRotor("III")
+		rotor.SetTopLetter('O')
 
-	// 		input := enigma.IdxToLetter(14) // 'O'
-	// 		output := byte('F')
+		input := enigma.IdxToLetter(14) // 'O'
+		output := byte('F')
 
-	// 		Expect(rotor.Forward(input)).To(Equal(output))
-	// 	})
+		Expect(rotor.Forward(input)).To(Equal(output))
+	})
 
-	// 	// `map_l_to_r rotor_I 'F' 10` should be `14`.
-	// 	It("Rotor I: Reverse 'F' 10 -> 14", func() {
-	// 		//          ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// 		//    EKMFLGDQVZNTOWYHXUSPAIBRCJ
-	// 		rotor := enigma.GetRotor("I")
-	// 		rotor.SetTopLetter('F')
+	// `map_l_to_r rotor_I 'F' 10` should be `14`.
+	It("Rotor I: Top Letter 'F' // Reverse // Pos 10 -> 14", func() {
+		//          ABCDEFGHIJKLMNOPQRSTUVWXYZ
+		//    EKMFLGDQVZNTOWYHXUSPAIBRCJ
+		rotor := enigma.GetRotor("I")
+		rotor.SetTopLetter('F')
 
-	// 		input := enigma.IdxToLetter(10) // 'K'
-	// 		output := byte('G')
-	// 		Expect(rotor.Reverse(input)).To(Equal(output))
-	// 	})
+		input := enigma.IdxToLetter(10) // 'K'
+		output := byte('W')
+		Expect(rotor.Reverse(input)).To(Equal(output))
+	})
 
-	// 	It("Rotor II: Starting K -- Misc", func() {
-	// 		rotor := enigma.GetRotor("II")
-	// 		rotor.SetTopLetter('K')
+	It("Rotor II: Top Letter 'K' // Wrap Test // F&R", func() {
+		rotor := enigma.GetRotor("II")
+		rotor.SetTopLetter('K')
 
-	// 		Expect(rotor.Forward(byte('A'))).To(Equal(byte('L')))
-	// 		Expect(rotor.Forward(byte('Q'))).To(Equal(byte('A')))
-	// 		Expect(rotor.Forward(byte('R'))).To(Equal(byte('J')))
-	// 		Expect(rotor.Forward(byte('U'))).To(Equal(byte('S')))
-	// 		Expect(rotor.Forward(byte('Z'))).To(Equal(byte('B')))
-	// 		// ...
-	// 		Expect(rotor.Reverse(byte('A'))).To(Equal(byte('K')))
-	// 		Expect(rotor.Reverse(byte('Z'))).To(Equal(byte('C')))
-	// 		Expect(rotor.Reverse(byte('H'))).To(Equal(byte('V')))
-	// 		Expect(rotor.Reverse(byte('T'))).To(Equal(byte('X')))
-	// 		Expect(rotor.Reverse(byte('Q'))).To(Equal(byte('A')))
+		fullTest(rotor)
+		// // Forward
+		// expectedFwd := rotor.Wiring()
+		// for idx, letter := range enigma.ALPHABET {
+		// 	outLetter := byte(expectedFwd[idx])
+		// 	Expect(rotor.Forward(byte(letter))).To(Equal(outLetter))
+		// }
 
-	// })
+		// // Reverse - NO WRAP
+		// inLettersss := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		// expectedRev := "QZFSPMHBVRTAEJOKGWUDXNCYLI"
+		// // inLettersss := "AX"
+		// // expectedRev := "QY"
+		// for idx, letter := range inLettersss {
+		// 	if letter == '-' {
+		// 		continue
+		// 	}
+		// 	outLetter := byte(expectedRev[idx])
+		// 	Expect(rotor.Reverse(byte(letter))).To(Equal(outLetter))
+		// }
+	})
+
+	It("Chain I/O -> III -> II -> ReflB", func() {
+		rotorII := enigma.GetRotor("II")
+		rotorIII := enigma.GetRotor("III")
+		reflB := enigma.GetReflector("B")
+
+		input := byte('A')
+
+		// Baseline
+		output := rotorIII.Forward(input)
+		Expect(output).To(Equal(byte('B')))
+
+		output = rotorII.Forward(output)
+		Expect(output).To(Equal(byte('J')))
+
+		output = reflB.Reflect(output)
+		Expect(output).To(Equal(byte('X')))
+
+		// Step III
+		// rotorIII.SetTopLetter('B')
+
+		// output = rotorIII.Forward(input)
+		// Expect(output).To(Equal(byte('D')))
+
+		// output = rotorII.Forward(output)
+		// Expect(output).To(Equal(byte('D')))
+
+		// output = reflB.Reflect(output)
+		// Expect(output).To(Equal(byte('H')))
+	})
 
 })

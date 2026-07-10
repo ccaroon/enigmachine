@@ -18,33 +18,21 @@ var _ = Describe("Enigma", func() {
 
 		Expect(machine).ToNot(BeNil())
 
-		// -------------------------------------
-		// Top => A
-		// outLetter := machine.EncipherLetter('A')
-		// Expect(outLetter).To(Equal(byte('T')))
-
-		// // Top => B
-		// rotorIII := machine.GetRotor(2)
-		// Expect(rotorIII.Id()).To(Equal("III"))
-		// rotorIII.SetTopLetter('B')
-		// outLetter = machine.EncipherLetter('A')
-		// Expect(outLetter).To(Equal(byte('S')))
-		// -------------------------------------
-
 		// A -> U
-		// outLetter := machine.EncipherLetter('A')
-		// Expect(outLetter).To(Equal(byte('U')))
-		// // reciprocal
-		// outLetter = machine.EncipherLetter('U')
-		// Expect(outLetter).To(Equal(byte('A')))
+		outLetter := machine.EncipherLetter('A')
+		Expect(outLetter).To(Equal(byte('U')))
+		// reciprocal
+		outLetter = machine.EncipherLetter('U')
+		Expect(outLetter).To(Equal(byte('A')))
 
-		// // G -> P
-		// outLetter = machine.EncipherLetter('G')
-		// Expect(outLetter).To(Equal(byte('P')))
-		// // reciprocal
-		// outLetter = machine.EncipherLetter('P')
-		// Expect(outLetter).To(Equal(byte('G')))
+		// G -> P
+		outLetter = machine.EncipherLetter('G')
+		Expect(outLetter).To(Equal(byte('P')))
+		// reciprocal
+		outLetter = machine.EncipherLetter('P')
+		Expect(outLetter).To(Equal(byte('G')))
 
+		// Step/Rotate III
 		// rotorIII := machine.GetRotor(2)
 		// Expect(rotorIII.Id()).To(Equal("III"))
 		// rotorIII.SetTopLetter('B')
