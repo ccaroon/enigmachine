@@ -38,11 +38,11 @@ class Rotor:
         self.w = self.ROTORS[name]
         self.inv = [""] * 26
 
-        print(f"N: {self.w}")
+        # print(f"N: {self.w}")
         for i, ch in enumerate(self.w):
             self.inv[Util.c2i(ch)] = Util.i2c(i)
 
-        print(f"I: {"".join(self.inv)}")
+        # print(f"I: {"".join(self.inv)}")
 
         self.pos = Util.c2i(pos)
         self.ring = Util.c2i(ring)
@@ -112,6 +112,22 @@ class Enigma:
         c = self.r.rev(c)
         return self.pb[c]
 
+    def test(self, ch):
+        rotorIII = self.r
+        # rotorIII.step()
+		# Expect(rotorIII.GetTopLetter()).To(Equal(byte('B')))
+
+		# // output := rotorIII.Forward(input)
+        output = rotorIII.fwd(ch)
+        print(f"A -> {output}")
+		# // Expect(output).To(Equal(byte('D')))
+
+		# // output = rotorIII.Forward('B')
+		# // Expect(output).To(Equal(byte('F')))
+
+		# // output = rotorIII.Forward('Z')
+		# // Expect(output).To(Equal(byte('B')))
+
     def encrypt(self, text):
         return "".join(
             self.enc_char(c) if c in self.ALPHABET else c for c in text.upper()
@@ -119,7 +135,7 @@ class Enigma:
 
 
 if __name__ == "__main__":
-    rotor = Rotor("I")
+    # rotor = Rotor("I")
     # e = Enigma(
     #     rotors=("III", "II", "I"),
     #     rings="AAA",
@@ -132,3 +148,6 @@ if __name__ == "__main__":
     #     except EOFError:
     #         break
     #     print(e.encrypt(s))
+
+    e = Enigma()
+    e.test('A')
