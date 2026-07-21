@@ -117,7 +117,6 @@ func (rotor *Rotor) Reverse(letter byte) byte {
 	x := (LetterToIdx(letter) + rotor.position) % 26
 	y := LetterToIdx(rotor.inverse[x])
 	z := IdxToLetter((y - rotor.position) % 26)
-
 	return z
 }
 

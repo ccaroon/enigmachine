@@ -27,6 +27,10 @@ func GetReflector(id string) *Reflector {
 	return reflector
 }
 
+func (ref *Reflector) Id() string {
+	return ref.id
+}
+
 func (ref *Reflector) Index(idx byte) byte {
 	return ref.wiring[idx]
 }

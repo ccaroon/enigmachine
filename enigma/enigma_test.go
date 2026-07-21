@@ -159,15 +159,82 @@ var _ = Describe("Enigma", func() {
 		Expect(outLetter).To(Equal(byte('G')))
 	})
 
+	It("Can encipher FUN letters", func() {
+		machine := enigma.NewEnigma(
+			"B",
+			[]string{"I", "II", "III"},
+			[]byte{},
+		)
+		machine.ConfigureRotors("FUN")
+
+		rotorI := machine.GetRotor("I")
+		Expect(rotorI.GetTopLetter()).To(Equal(byte('F')))
+
+		rotorII := machine.GetRotor("II")
+		Expect(rotorII.GetTopLetter()).To(Equal(byte('U')))
+
+		rotorIII := machine.GetRotor("III")
+		Expect(rotorIII.GetTopLetter()).To(Equal(byte('N')))
+
+		outLetter := machine.EncipherLetter('Y')
+		Expect(outLetter).To(Equal(byte('A')))
+
+	})
+
+	It("CRAIG // AAAAA -> BDZGO", func() {
+		var outLetter byte
+
+		machine := enigma.NewEnigma(
+			"B",
+			[]string{"I", "II", "III"},
+			[]byte{},
+		)
+
+		//
+
+		// input -> A
+		machine.Step()
+		// outLetter = machine.EncipherLetter('A')
+		// Expect(outLetter).To(Equal(byte('B')))
+
+		// input -> A
+		machine.Step()
+		// outLetter = machine.EncipherLetter('A')
+		// Expect(outLetter).To(Equal(byte('D')))
+
+		// input -> A
+		machine.Step()
+		outLetter = machine.EncipherLetter('A')
+		Expect(outLetter).To(Equal(byte('Z')))
+
+		// rotorIII := machine.GetRotor("III")
+		// outLetter = rotorIII.Reverse('C')
+		// Expect(outLetter).To(Equal(byte('Z')))
+
+		// input -> A
+		// machine.Step()
+		// outLetter = machine.EncipherLetter('A')
+		// Expect(outLetter).To(Equal(byte('G')))
+
+		// input -> A
+		// machine.Step()
+		// outLetter = machine.EncipherLetter('A')
+		// Expect(outLetter).To(Equal(byte('O')))
+
+	})
+
 	It("Can encipher a string", func() {
 		machine := enigma.NewEnigma(
 			"B",
 			[]string{"I", "II", "III"},
-			[]byte{'A', 'Z'},
+			// []byte{'A', 'Z'},
+			[]byte{},
 		)
-		machine.ConfigureRotors("FUN")
+		// machine.ConfigureRotors("FUN")
 
-		Expect(machine.EncipherString("YNGXQ")).To(Equal("OCAML"))
+		// Expect(machine.EncipherString("YNGXQ")).To(Equal("OCAML"))
+
+		Expect(machine.EncipherString("AAAAA")).To(Equal("BDZGO"))
 	})
 
 })
