@@ -2,27 +2,30 @@ package enigma
 
 type Rotor struct {
 	id       string
-	wiring   string
-	inverse  string
-	notch    byte
-	position byte
+	wiring   []int
+	inverse  []int
+	notch    int
+	position int
 }
 
-func NewRotor(id string, wiring string, topLetter byte, notch byte) *Rotor {
+func NewRotor(id string, wiring string, topLetter rune, notch rune) *Rotor {
 	rotor := &Rotor{
 		id:     id,
-		wiring: wiring,
-		notch:  notch,
+		wiring: make([]int, 26),
+		notch:  LetterToIdx(notch),
 	}
 
-	// Create inverse wirings for "reverse" operations
-	inverse := make([]byte, 26)
-	for idx, letter := range rotor.wiring {
-		newIdx := LetterToIdx(byte(letter))
-		newLtr := IdxToLetter(byte(idx))
-		inverse[newIdx] = newLtr
+	for inIdx, letter := range wiring {
+		rotor.wiring[inIdx] = LetterToIdx(letter)
 	}
-	rotor.inverse = string(inverse)
+	// Create inverse wirings for "reverse" operations
+	// inverse := make([]byte, 26)
+	// for idx, letter := range rotor.wiring {
+	// 	newIdx := LetterToIdx(byte(letter))
+	// 	newLtr := IdxToLetter(byte(idx))
+	// 	inverse[newIdx] = newLtr
+	// }
+	// rotor.inverse = string(inverse)
 
 	rotor.SetTopLetter(topLetter)
 
@@ -55,25 +58,29 @@ func (rotor *Rotor) Id() string {
 	return rotor.id
 }
 
-func (rotor *Rotor) Wiring() string {
-	// Rotor Wiring adjusted for position/offset
-	adjWiring := rotor.wiring[rotor.position:] + rotor.wiring[0:rotor.position]
-
-	return adjWiring
+func (rotor *Rotor) Wiring() []int {
+	return rotor.wiring
 }
 
-func (rotor *Rotor) InverseWiring() string {
-	// Rotor Inverse Wiring adjusted for position/offset
-	adjWiring := rotor.inverse[rotor.position:] + rotor.wiring[0:rotor.position]
+// func (rotor *Rotor) Wiring() string {
+// 	// Rotor Wiring adjusted for position/offset
+// 	adjWiring := rotor.wiring[rotor.position:] + rotor.wiring[0:rotor.position]
 
-	return adjWiring
-}
+// 	return adjWiring
+// }
 
-func (rotor *Rotor) SetTopLetter(letter byte) {
+// // func (rotor *Rotor) InverseWiring() string {
+// // 	// Rotor Inverse Wiring adjusted for position/offset
+// // 	adjWiring := rotor.inverse[rotor.position:] + rotor.wiring[0:rotor.position]
+
+// // 	return adjWiring
+// // }
+
+func (rotor *Rotor) SetTopLetter(letter rune) {
 	rotor.position = LetterToIdx(letter)
 }
 
-func (rotor *Rotor) GetTopLetter() byte {
+func (rotor *Rotor) GetTopLetter() rune {
 	return IdxToLetter(rotor.position)
 }
 
@@ -83,41 +90,46 @@ func (rotor *Rotor) Step() {
 
 func (rotor *Rotor) AtNotch() bool {
 	atNotch := false
-	if IdxToLetter(rotor.position) == rotor.notch {
+	if rotor.position == rotor.notch {
 		atNotch = true
 	}
 
 	return atNotch
 }
 
+func (rotor *Rotor) RightToLeft(letter rune) rune {
+	inPos := LetterToIdx(letter)
+	outPos := rotor.Forward(inPos)
+
+	return IdxToLetter(outPos)
+}
+
 // Right to Left
-// ------
-// IO   -   ABCDEFGHIJKLMNOPQRSTUVWXYZ
-// III  -  BDFHJLCPRTXVZNYEIWGAKMUSQO
-// II   -   AJDKSIRUXBLHWTMCQGZNPYFVOE
-// ------
-func (rotor *Rotor) Forward(letter byte) byte {
-	idx := (LetterToIdx(letter) + rotor.position) % 26
-	return rotor.wiring[idx] - rotor.position
+// ABCDEFGHIJKLMNOPQRSTUVWXYZ
+// 0123456789
+func (rotor *Rotor) Forward(inPos int) int {
+	adjPos := (inPos + rotor.position) % 26
+	// return rotor.wiring[idx] - rotor.position
+	return rotor.wiring[adjPos]
 }
 
-// Left to Right
-// --------------------
+// // Left to Right
+// // --------------------
+// // func (rotor *Rotor) Reverse(letter byte) byte {
+// // 	lIdx := strings.IndexByte(rotor.wiring, letter)
+// // 	outPos := (byte(lIdx) + (26 - rotor.position)) % 26
+
+// // 	outLetter := IdxToLetter(outPos)
+
+// //		return outLetter
+// //	}
+// //
+// // --------------------
 // func (rotor *Rotor) Reverse(letter byte) byte {
-// 	lIdx := strings.IndexByte(rotor.wiring, letter)
-// 	outPos := (byte(lIdx) + (26 - rotor.position)) % 26
+// 	x := (LetterToIdx(letter) + rotor.position) % 26
+// 	y := LetterToIdx(rotor.inverse[x])
+// 	z := IdxToLetter((y - rotor.position) % 26)
+// 	return z
+// }
 
-// 	outLetter := IdxToLetter(outPos)
-
-//		return outLetter
-//	}
-//
-// --------------------
-func (rotor *Rotor) Reverse(letter byte) byte {
-	x := (LetterToIdx(letter) + rotor.position) % 26
-	y := LetterToIdx(rotor.inverse[x])
-	z := IdxToLetter((y - rotor.position) % 26)
-	return z
-}
-
-// EOF
+// // EOF

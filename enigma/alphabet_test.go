@@ -10,16 +10,14 @@ var _ = Describe("Alphabet", func() {
 
 	It("Can convert a letter (A-Z) to an index (0-25)", func() {
 		for idx, letter := range enigma.ALPHABET {
-			Expect(enigma.LetterToIdx(byte(letter))).To(Equal(byte(idx)))
+			Expect(enigma.LetterToIdx(letter)).To(Equal(idx))
 		}
 	})
 
 	It("Can convert an index(0-25) to a letter (A-Z)", func() {
-		var idx byte
-		for idx = range 26 {
-			expectedLetter := byte(enigma.ALPHABET[idx])
-			Expect(enigma.IdxToLetter(byte(idx))).To(Equal(expectedLetter))
+		for idx := range 26 {
+			expectedLetter := rune(enigma.ALPHABET[idx])
+			Expect(enigma.IdxToLetter(idx)).To(Equal(expectedLetter))
 		}
 	})
-
 })

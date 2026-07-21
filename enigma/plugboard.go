@@ -4,7 +4,7 @@ type Plugboard struct {
 	connections []Cable
 }
 
-func NewPlugboard(connSpec []byte) *Plugboard {
+func NewPlugboard(connSpec []rune) *Plugboard {
 	var specLen = len(connSpec)
 
 	// Should be an even number of letters
@@ -44,7 +44,7 @@ func (pb *Plugboard) GetCable(idx int) *Cable {
 	return cable
 }
 
-func (pb *Plugboard) FindCable(letter byte) *Cable {
+func (pb *Plugboard) FindCable(letter rune) *Cable {
 	var foundCable *Cable
 
 	for _, cable := range pb.connections {
@@ -57,8 +57,8 @@ func (pb *Plugboard) FindCable(letter byte) *Cable {
 	return foundCable
 }
 
-func (pb *Plugboard) Map(letter byte) byte {
-	var outLetter byte
+func (pb *Plugboard) Map(letter rune) rune {
+	var outLetter rune
 
 	cable := pb.FindCable(letter)
 	if cable != nil {
