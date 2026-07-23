@@ -8,6 +8,11 @@ type Rotor struct {
 	position int
 }
 
+// type RotorPosition struct {
+// 	Index  int
+// 	Letter rune
+// }
+
 func NewRotor(id string, wiring string, topLetter rune, notch rune) *Rotor {
 	rotor := &Rotor{
 		id:     id,
@@ -80,18 +85,44 @@ func (rotor *Rotor) AtNotch() bool {
 }
 
 // Forward | RightToLeft
-func (rotor *Rotor) RightToLeft(letter rune) rune {
-	inPos := LetterToIdx(letter)
-	outPos := rotor.Forward(inPos)
+// func (rotor *Rotor) RightToLeft(letter rune) rune {
+// 	inPos := LetterToIdx(letter)
+// 	outPos := rotor.Forward(inPos)
 
-	return IdxToLetter(outPos)
-}
+// 	return IdxToLetter(outPos)
+// }
 
-func (rotor *Rotor) Forward(inPos int) int {
+func (rotor *Rotor) Fwd(inPos int) (int, rune) {
 	adjPos := (inPos + rotor.position) % 26
 
-	return rotor.wiring[adjPos]
+	result := rotor.wiring[adjPos]
+
+	// output_letter = self.wiring[(index + self.offset)%26]
+	outLtr := IdxToLetter(result)
+	// output_index = (ALPHABET.index(output_letter) - self.offset)%26
+	outIdx := (result - rotor.position) % 26
+
+	return outIdx, outLtr
 }
+
+// func (rotor *Rotor) Fwd2(inPos int) RotorPosition {
+// 	adjPos := (inPos + rotor.position) % 26
+
+// 	result := rotor.wiring[adjPos]
+
+// 	// output_letter = self.wiring[(index + self.offset)%26]
+// 	outLtr := IdxToLetter(result)
+// 	// output_index = (ALPHABET.index(output_letter) - self.offset)%26
+// 	outIdx := (result - rotor.position) % 26
+
+// 	return RotorPosition{outIdx, outLtr}
+// }
+
+// func (rotor *Rotor) Forward(inPos int) int {
+// 	adjPos := (inPos + rotor.position) % 26
+
+// 	return rotor.wiring[adjPos]
+// }
 
 // Reverse | LeftToRight
 func (rotor *Rotor) LeftToRight(letter rune) rune {
@@ -106,7 +137,7 @@ func (rotor *Rotor) LeftToRight(letter rune) rune {
 // III(R): [19 0 6 1 15 2 18 3 16 4 20 5 21 13 25 7 24 8 23 9 22 11 17 10 14 12]
 func (rotor *Rotor) Reverse(inPos int) int {
 	outPos := rotor.inverse[inPos]
-	adjOut := outPos - rotor.position
+	adjOut := outPos + rotor.position
 
 	if adjOut < 0 {
 		// adjOut = 26 + adjOut%26
@@ -117,5 +148,5 @@ func (rotor *Rotor) Reverse(inPos int) int {
 
 	// fmt.Printf("\n%d -> %d => %d\n", inPos, outPos, adjOut)
 
-	return adjOut
+	return adjOut + rotor.position
 }

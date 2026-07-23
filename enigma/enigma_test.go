@@ -8,9 +8,9 @@ package enigma_test
 // )
 
 // func testRotorConfig(machine *enigma.Enigma, setting string) {
-// 	Expect(machine.GetRotorByIdx(0).GetTopLetter()).To(Equal(byte(setting[0])))
-// 	Expect(machine.GetRotorByIdx(1).GetTopLetter()).To(Equal(byte(setting[1])))
-// 	Expect(machine.GetRotorByIdx(2).GetTopLetter()).To(Equal(byte(setting[2])))
+// 	Expect(machine.GetRotorByIdx(0).GetTopLetter()).To(Equal(rune(setting[0])))
+// 	Expect(machine.GetRotorByIdx(1).GetTopLetter()).To(Equal(rune(setting[1])))
+// 	Expect(machine.GetRotorByIdx(2).GetTopLetter()).To(Equal(rune(setting[2])))
 // }
 
 // var _ = Describe("Enigma", func() {
@@ -19,7 +19,7 @@ package enigma_test
 // 		machine := enigma.NewEnigma(
 // 			"B",
 // 			[]string{"I", "II", "III"},
-// 			[]byte{},
+// 			[]rune{},
 // 		)
 
 // 		Expect(machine).ToNot(BeNil())
@@ -41,7 +41,7 @@ package enigma_test
 // 		machine := enigma.NewEnigma(
 // 			"B",
 // 			[]string{"I", "II", "III"},
-// 			[]byte{},
+// 			[]rune{},
 // 		)
 
 // 		Expect(machine).ToNot(BeNil())
@@ -51,32 +51,11 @@ package enigma_test
 // 		Expect(machine.GetRotorByIdx(2).Id()).To(Equal("III"))
 // 	})
 
-// 	It("Can Pass the Identity Test", func() {
-// 		machine := enigma.NewEnigma(
-// 			"I", // Identity Reflector
-// 			[]string{},
-// 			[]byte{},
-// 		)
-// 		Expect(machine).ToNot(BeNil())
-
-// 		outLetter := machine.EncipherLetter('A')
-// 		Expect(outLetter).To(Equal(byte('A')))
-
-// 		outLetter = machine.EncipherLetter('M')
-// 		Expect(outLetter).To(Equal(byte('M')))
-
-// 		outLetter = machine.EncipherLetter('X')
-// 		Expect(outLetter).To(Equal(byte('X')))
-
-// 		outLetter = machine.EncipherLetter('Z')
-// 		Expect(outLetter).To(Equal(byte('Z')))
-// 	})
-
 // 	It("Can set starting config for Rotors", func() {
 // 		machine := enigma.NewEnigma(
 // 			"B",
 // 			[]string{"III", "II", "I"},
-// 			[]byte{},
+// 			[]rune{},
 // 		)
 
 // 		machine.ConfigureRotors("ABC")
@@ -90,7 +69,7 @@ package enigma_test
 // 		machine := enigma.NewEnigma(
 // 			"B",
 // 			[]string{"III", "II", "I"},
-// 			[]byte{},
+// 			[]rune{},
 // 		)
 
 // 		machine.ConfigureRotors("KDO")
@@ -108,133 +87,162 @@ package enigma_test
 // 		}
 // 	})
 
-// 	It("Can encipher a single letter", func() {
-// 		machine := enigma.NewEnigma(
-// 			"B",
-// 			[]string{"I", "II", "III"},
-// 			[]byte{},
-// 		)
+// 	Context("Enciphering", func() {
+// 		Specify("Single Letter: B | I,II,III | AAA | []", func() {
+// 			machine := enigma.NewEnigma(
+// 				"B",
+// 				[]string{"I", "II", "III"},
+// 				[]rune{},
+// 			)
 
-// 		Expect(machine).ToNot(BeNil())
+// 			Expect(machine).ToNot(BeNil())
 
-// 		// A -> U
-// 		outLetter := machine.EncipherLetter('A')
-// 		Expect(outLetter).To(Equal(byte('U')))
-// 		// reciprocal
-// 		outLetter = machine.EncipherLetter('U')
-// 		Expect(outLetter).To(Equal(byte('A')))
+// 			// A -> U
+// 			outLetter := machine.EncipherLetter('A')
+// 			Expect(outLetter).To(Equal('U'))
+// 			// reciprocal
+// 			outLetter = machine.EncipherLetter('U')
+// 			Expect(outLetter).To(Equal('A'))
 
-// 		// G -> P
-// 		outLetter = machine.EncipherLetter('G')
-// 		Expect(outLetter).To(Equal(byte('P')))
-// 		// reciprocal
-// 		outLetter = machine.EncipherLetter('P')
-// 		Expect(outLetter).To(Equal(byte('G')))
-// 	})
+// 			// G -> P
+// 			outLetter = machine.EncipherLetter('G')
+// 			Expect(outLetter).To(Equal('P'))
+// 			// reciprocal
+// 			outLetter = machine.EncipherLetter('P')
+// 			Expect(outLetter).To(Equal('G'))
+// 		})
 
-// 	It("Can encipher a single letter with stepping", func() {
-// 		machine := enigma.NewEnigma(
-// 			"B",
-// 			[]string{"I", "II", "III"},
-// 			[]byte{},
-// 		)
+// 		Specify("Single Letter: B | I,II,III | AAB | []", func() {
+// 			machine := enigma.NewEnigma(
+// 				"B",
+// 				[]string{"I", "II", "III"},
+// 				[]rune{},
+// 			)
 
-// 		Expect(machine).ToNot(BeNil())
+// 			Expect(machine).ToNot(BeNil())
 
-// 		// Step/Rotate III
-// 		rotorIII := machine.GetRotor("III")
-// 		Expect(rotorIII.Id()).To(Equal("III"))
-// 		rotorIII.Step()
+// 			machine.ConfigureRotors("AAB")
 
-// 		outLetter := machine.EncipherLetter('A')
-// 		Expect(outLetter).To(Equal(byte('B')))
-// 		// reciprocal
-// 		outLetter = machine.EncipherLetter('B')
-// 		Expect(outLetter).To(Equal(byte('A')))
+// 			// A -> B
+// 			outLetter := machine.EncipherLetter('A')
+// 			Expect(outLetter).To(Equal('B'), "%c -> %c", 'A', outLetter)
+// 			// // reciprocal
+// 			// outLetter = machine.EncipherLetter('U')
+// 			// Expect(outLetter).To(Equal('A'))
 
-// 		outLetter = machine.EncipherLetter('G')
-// 		Expect(outLetter).To(Equal(byte('X')))
-// 		// reciprocal
-// 		outLetter = machine.EncipherLetter('X')
-// 		Expect(outLetter).To(Equal(byte('G')))
-// 	})
-
-// 	It("Can encipher FUN letters", func() {
-// 		machine := enigma.NewEnigma(
-// 			"B",
-// 			[]string{"I", "II", "III"},
-// 			[]byte{},
-// 		)
-// 		machine.ConfigureRotors("FUN")
-
-// 		rotorI := machine.GetRotor("I")
-// 		Expect(rotorI.GetTopLetter()).To(Equal(byte('F')))
-
-// 		rotorII := machine.GetRotor("II")
-// 		Expect(rotorII.GetTopLetter()).To(Equal(byte('U')))
-
-// 		rotorIII := machine.GetRotor("III")
-// 		Expect(rotorIII.GetTopLetter()).To(Equal(byte('N')))
-
-// 		outLetter := machine.EncipherLetter('Y')
-// 		Expect(outLetter).To(Equal(byte('A')))
+// 			// // G -> P
+// 			// outLetter = machine.EncipherLetter('G')
+// 			// Expect(outLetter).To(Equal('P'))
+// 			// // reciprocal
+// 			// outLetter = machine.EncipherLetter('P')
+// 			// Expect(outLetter).To(Equal('G'))
+// 		})
 
 // 	})
 
-// 	It("NOT // AAAAA -> BDZGO", func() {
-// 		var outLetter byte
+// 	// It("Can encipher a single letter with stepping", func() {
+// 	// 	machine := enigma.NewEnigma(
+// 	// 		"B",
+// 	// 		[]string{"I", "II", "III"},
+// 	// 		[]rune{},
+// 	// 	)
 
-// 		machine := enigma.NewEnigma(
-// 			"B",
-// 			[]string{"I", "II", "III"},
-// 			[]byte{},
-// 		)
+// 	// 	Expect(machine).ToNot(BeNil())
 
-// 		//
+// 	// 	// Step/Rotate III
+// 	// 	rotorIII := machine.GetRotor("III")
+// 	// 	Expect(rotorIII.Id()).To(Equal("III"))
+// 	// 	rotorIII.Step()
 
-// 		// input -> A
-// 		machine.Step()
-// 		// outLetter = machine.EncipherLetter('A')
-// 		// Expect(outLetter).To(Equal(byte('B')))
+// 	// 	outLetter := machine.EncipherLetter('A')
+// 	// 	Expect(outLetter).To(Equal(byte('B')))
+// 	// 	// reciprocal
+// 	// 	outLetter = machine.EncipherLetter('B')
+// 	// 	Expect(outLetter).To(Equal(byte('A')))
 
-// 		// input -> A
-// 		machine.Step()
-// 		// outLetter = machine.EncipherLetter('A')
-// 		// Expect(outLetter).To(Equal(byte('D')))
+// 	// 	outLetter = machine.EncipherLetter('G')
+// 	// 	Expect(outLetter).To(Equal(byte('X')))
+// 	// 	// reciprocal
+// 	// 	outLetter = machine.EncipherLetter('X')
+// 	// 	Expect(outLetter).To(Equal(byte('G')))
+// 	// })
 
-// 		// input -> A
-// 		machine.Step()
-// 		outLetter = machine.EncipherLetter('A')
-// 		Expect(outLetter).To(Equal(byte('Z')))
+// 	// It("Can encipher FUN letters", func() {
+// 	// 	machine := enigma.NewEnigma(
+// 	// 		"B",
+// 	// 		[]string{"I", "II", "III"},
+// 	// 		[]rune{},
+// 	// 	)
+// 	// 	machine.ConfigureRotors("FUN")
 
-// 		// rotorIII := machine.GetRotor("III")
-// 		// outLetter = rotorIII.Reverse('C')
-// 		// Expect(outLetter).To(Equal(byte('Z')))
+// 	// 	rotorI := machine.GetRotor("I")
+// 	// 	Expect(rotorI.GetTopLetter()).To(Equal(byte('F')))
 
-// 		// input -> A
-// 		// machine.Step()
-// 		// outLetter = machine.EncipherLetter('A')
-// 		// Expect(outLetter).To(Equal(byte('G')))
+// 	// 	rotorII := machine.GetRotor("II")
+// 	// 	Expect(rotorII.GetTopLetter()).To(Equal(byte('U')))
 
-// 		// input -> A
-// 		// machine.Step()
-// 		// outLetter = machine.EncipherLetter('A')
-// 		// Expect(outLetter).To(Equal(byte('O')))
+// 	// 	rotorIII := machine.GetRotor("III")
+// 	// 	Expect(rotorIII.GetTopLetter()).To(Equal(byte('N')))
 
-// 	})
+// 	// 	outLetter := machine.EncipherLetter('Y')
+// 	// 	Expect(outLetter).To(Equal(byte('A')))
 
-// 	It("Can encipher a string", func() {
-// 		machine := enigma.NewEnigma(
-// 			"B",
-// 			[]string{"I", "II", "III"},
-// 			// []byte{'A', 'Z'},
-// 			[]byte{},
-// 		)
-// 		// machine.ConfigureRotors("FUN")
+// 	// })
 
-// 		// Expect(machine.EncipherString("YNGXQ")).To(Equal("OCAML"))
+// 	// It("CRAIG // AAAAA -> BDZGO", func() {
+// 	// 	var outLetter rune
 
-// 		Expect(machine.EncipherString("AAAAA")).To(Equal("BDZGO"))
-// 	})
+// 	// 	machine := enigma.NewEnigma(
+// 	// 		"B",
+// 	// 		[]string{"I", "II", "III"},
+// 	// 		[]rune{},
+// 	// 	)
+
+// 	// 	//
+
+// 	// 	// input -> A
+// 	// 	machine.Step()
+// 	// 	// outLetter = machine.EncipherLetter('A')
+// 	// 	// Expect(outLetter).To(Equal(byte('B')))
+
+// 	// 	// input -> A
+// 	// 	machine.Step()
+// 	// 	// outLetter = machine.EncipherLetter('A')
+// 	// 	// Expect(outLetter).To(Equal(byte('D')))
+
+// 	// 	// input -> A
+// 	// 	machine.Step()
+// 	// 	outLetter = machine.EncipherLetter('A')
+// 	// 	Expect(outLetter).To(Equal(byte('Z')))
+
+// 	// 	// rotorIII := machine.GetRotor("III")
+// 	// 	// outLetter = rotorIII.Reverse('C')
+// 	// 	// Expect(outLetter).To(Equal(byte('Z')))
+
+// 	// 	// input -> A
+// 	// 	// machine.Step()
+// 	// 	// outLetter = machine.EncipherLetter('A')
+// 	// 	// Expect(outLetter).To(Equal(byte('G')))
+
+// 	// 	// input -> A
+// 	// 	// machine.Step()
+// 	// 	// outLetter = machine.EncipherLetter('A')
+// 	// 	// Expect(outLetter).To(Equal(byte('O')))
+
+// 	// })
+
+// 	// It("Can encipher a string", func() {
+// 	// 	machine := enigma.NewEnigma(
+// 	// 		"B",
+// 	// 		[]string{"I", "II", "III"},
+// 	// 		// []byte{'A', 'Z'},
+// 	// 		[]byte{},
+// 	// 	)
+// 	// 	// machine.ConfigureRotors("FUN")
+
+// 	// 	// Expect(machine.EncipherString("YNGXQ")).To(Equal("OCAML"))
+
+// 	// 	Expect(machine.EncipherString("AAAAA")).To(Equal("BDZGO"))
+// 	// })
 
 // })
