@@ -7,6 +7,12 @@ import (
 )
 
 var _ = Describe("Reflector", func() {
+
+	It("Can get the ID", func() {
+		refB := enigma.GetReflector("B")
+		Expect(refB.Id()).To(Equal("B"))
+	})
+
 	// YRUHQSLDPXNGOKMIEBFZCWVJAT
 	It("Should properly map all valid inputs", func() {
 		refB := enigma.GetReflector("B")

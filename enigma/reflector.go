@@ -16,8 +16,6 @@ func GetReflector(id string) *Reflector {
 	var reflector *Reflector
 
 	switch id {
-	case "I": // "I"dentity Reflector
-		reflector = NewReflector("T", ALPHABET)
 	case "B":
 		reflector = NewReflector("B", "YRUHQSLDPXNGOKMIEBFZCWVJAT")
 	case "C":

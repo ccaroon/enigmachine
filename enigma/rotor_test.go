@@ -89,40 +89,102 @@ var _ = Describe("Rotor", func() {
 		Expect(rotor.AtNotch()).To(BeTrue())
 	})
 
-	// [1 3 5 7 9 11 2 15 17 19 23 21 25 13 24 4 8 22 6 0 10 12 20 18 16 14]
-	It("Rotor III // Forward // Top Letter 'A'", func() {
+	Context("Rotor III // Forward", func() {
 		rotor := enigma.GetRotor("III")
 
-		Expect(rotor.GetTopLetter()).To(Equal('A'))
+		Specify("Top Letter 'A'", func() {
+			Expect(rotor.GetTopLetter()).To(Equal('A'))
 
-		// by position
-		Expect(rotor.Forward(0)).To(Equal(1))
+			// By("Position")
+			Expect(rotor.Forward(0)).To(Equal(1))
 
-		// by converted position
-		inPos := enigma.LetterToIdx('A')
-		outPos := enigma.LetterToIdx('B')
-		Expect(rotor.Forward(inPos)).To(Equal(outPos))
+			// By("Converted Position (LetterToIdx)")
+			inPos := enigma.LetterToIdx('A')
+			outPos := enigma.LetterToIdx('B')
+			Expect(rotor.Forward(inPos)).To(Equal(outPos))
 
-		// by letter
-		Expect(rotor.RightToLeft('A')).To(Equal('B'))
+			// By("Letter")
+			Expect(rotor.RightToLeft('A')).To(Equal('B'))
+		})
+
+		Specify("Top Letter 'B'", func() {
+			rotor.SetTopLetter('B')
+			Expect(rotor.GetTopLetter()).To(Equal('B'))
+
+			// By Position
+			Expect(rotor.Forward(0)).To(Equal(3))
+
+			// By Converted Letter
+			inPos := enigma.LetterToIdx('A')
+			outPos := enigma.LetterToIdx('D')
+			Expect(rotor.Forward(inPos)).To(Equal(outPos))
+
+			// By Letter
+			Expect(rotor.RightToLeft('A')).To(Equal('D'))
+			Expect(rotor.RightToLeft('B')).To(Equal('F'))
+		})
+
+		Specify("Top Letter 'X'", func() {
+			rotor.SetTopLetter('X')
+			Expect(rotor.GetTopLetter()).To(Equal('X'))
+
+			Expect(rotor.RightToLeft('A')).To(Equal('S'))
+			Expect(rotor.RightToLeft('X')).To(Equal('K'))
+		})
 	})
 
-	// [1 3 5 7 9 11 2 15 17 19 23 21 25 13 24 4 8 22 6 0 10 12 20 18 16 14]
-	It("Rotor III // Forward // Top Letter 'B'", func() {
+	Context("Rotor III // Reverse", func() {
 		rotor := enigma.GetRotor("III")
-		rotor.SetTopLetter('B')
-		Expect(rotor.GetTopLetter()).To(Equal('B'))
 
-		// by position
-		Expect(rotor.Forward(0)).To(Equal(3))
+		Specify("Top Letter 'A'", func() {
+			Expect(rotor.GetTopLetter()).To(Equal('A'))
 
-		// by converted position
-		inPos := enigma.LetterToIdx('A')
-		outPos := enigma.LetterToIdx('D')
-		Expect(rotor.Forward(inPos)).To(Equal(outPos))
+			// By Position
+			Expect(rotor.Reverse(1)).To(Equal(0), "Position: 1 -> 0")
 
-		// by letter
-		Expect(rotor.RightToLeft('A')).To(Equal('D'))
+			// By Converted Letter
+			inPos := enigma.LetterToIdx('B')
+			outPos := enigma.LetterToIdx('A')
+			Expect(rotor.Reverse(inPos)).To(Equal(outPos), "LetterToIdx: B -> A")
+
+			// By Letter
+			for _, set := range []string{"BA", "AT", "CG", "ZM"} {
+				inLetter := rune(set[0])
+				outLetter := rune(set[1])
+				Expect(rotor.LeftToRight(inLetter)).To(Equal(outLetter), "Letter: %c -> %c", inLetter, outLetter)
+			}
+		})
+
+		Specify("Top Letter 'B'", func() {
+			rotor.SetTopLetter('B')
+			Expect(rotor.GetTopLetter()).To(Equal('B'))
+
+			// By Position
+			Expect(rotor.Reverse(1)).To(Equal(25), "Position: 1 -> 25")
+
+			// By Converted Letter
+			inPos := enigma.LetterToIdx('B')
+			outPos := enigma.LetterToIdx('Z')
+			Expect(rotor.Reverse(inPos)).To(Equal(outPos), "LetterToIdx: B -> Z")
+
+			// By Letter
+			for _, set := range []string{"AS", "BZ", "CF", "OY"} {
+				inLetter := rune(set[0])
+				outLetter := rune(set[1])
+				Expect(rotor.LeftToRight(inLetter)).To(Equal(outLetter), "Letter: %c -> %c", inLetter, outLetter)
+			}
+		})
+
+		Specify("Top Letter 'V'", func() {
+			rotor.SetTopLetter('V')
+			Expect(rotor.GetTopLetter()).To(Equal('V'))
+
+			// By Letter
+			for _, set := range []string{"AY", "BF", "SC", "VQ", "ZR"} {
+				inLetter := rune(set[0])
+				outLetter := rune(set[1])
+				Expect(rotor.LeftToRight(inLetter)).To(Equal(outLetter), "Letter: %c -> %c", inLetter, outLetter)
+			}
+		})
 	})
-
 })
