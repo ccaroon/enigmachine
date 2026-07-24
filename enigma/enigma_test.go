@@ -173,19 +173,20 @@ var _ = Describe("Enigma", func() {
 	// 		[]string{"I", "II", "III"},
 	// 		[]rune{},
 	// 	)
-	// 	machine.ConfigureRotors("FUN")
+	// 	machine.ConfigureRotors("FUM")
 
 	// 	rotorI := machine.GetRotor("I")
-	// 	Expect(rotorI.GetTopLetter()).To(Equal(byte('F')))
+	// 	Expect(rotorI.GetTopLetter()).To(Equal('F'))
 
 	// 	rotorII := machine.GetRotor("II")
-	// 	Expect(rotorII.GetTopLetter()).To(Equal(byte('U')))
+	// 	Expect(rotorII.GetTopLetter()).To(Equal('U'))
 
 	// 	rotorIII := machine.GetRotor("III")
-	// 	Expect(rotorIII.GetTopLetter()).To(Equal(byte('N')))
+	// 	Expect(rotorIII.GetTopLetter()).To(Equal('M'))
 
-	// 	outLetter := machine.EncipherLetter('Y')
-	// 	Expect(outLetter).To(Equal(byte('A')))
+	// 	machine.Step()
+	// 	outLetter := machine.EncipherLetter('A')
+	// 	Expect(outLetter).To(Equal('Y'), "FUN(Y): Got [%c]", outLetter)
 
 	// })
 
@@ -232,6 +233,14 @@ var _ = Describe("Enigma", func() {
 		input = "heLLo 42 World"
 		expOutput = "ILBDA 42 AMTAZ"
 		Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+
+		machine.ConfigureRotors("FUN")
+		// machine.ConfigureRotors("AAA")
+		input = "PYTHON"
+		expOutput = "EGDBTJ"
+		// expOutput = "LMHKAE"
+		Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+
 	})
 
 })

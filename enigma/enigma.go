@@ -1,7 +1,6 @@
 package enigma
 
 import (
-	"fmt"
 	"slices"
 	"strings"
 )
@@ -50,13 +49,6 @@ func (enigma *Enigma) ConfigureRotors(startLetters string) {
 	}
 }
 
-// func (enigma *Enigma) Step2() {
-// 	// Just before every letter is enciphered,
-// 	// if the top letter of any rotor *except the leftmost* is its turnover,
-// 	// then that rotor and the rotor to its left step.
-
-// }
-
 func (enigma *Enigma) Step() {
 	// TODO: Generalize to N rotors
 
@@ -81,20 +73,20 @@ func (enigma *Enigma) EncipherLetter(letter rune) rune {
 	// PLUGBOARD
 	outLetter = enigma.plugboard.Map(inLetter)
 	outIdx := LetterToIdx(outLetter)
-	fmt.Printf("\nPB(1): %c -> %c\n", inLetter, outLetter)
+	// fmt.Printf("\nPB(1): %c -> %c\n", inLetter, outLetter)
 
 	// ROTORS
 	for idx := len(enigma.rotors) - 1; idx >= 0; idx-- {
 		rotor := enigma.rotors[idx]
 		inIdx := outIdx
 		outIdx, outLetter = rotor.Forward(inIdx)
-		fmt.Printf("Rotor%s(F): %c -> %c\n", rotor.Id(), inLetter, outLetter)
+		// fmt.Printf("Rotor%s(F): %c -> %c\n", rotor.Id(), inLetter, outLetter)
 	}
 	// REFLECTOR
 	inLetter = outLetter
 	outLetter = enigma.reflector.Reflect(inLetter)
 	outIdx = LetterToIdx(outLetter)
-	fmt.Printf("Refl%s: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
+	// fmt.Printf("Refl%s: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
 
 	// ### REVERSE (left-to-right) ###
 	// ROTORS
@@ -102,12 +94,12 @@ func (enigma *Enigma) EncipherLetter(letter rune) rune {
 		rotor := enigma.rotors[idx]
 		inIdx := outIdx
 		outIdx, outLetter = rotor.Reverse(inIdx)
-		fmt.Printf("Rotor%s(R): %c -> %c\n", rotor.Id(), inLetter, outLetter)
+		// fmt.Printf("Rotor%s(R): %c -> %c\n", rotor.Id(), inLetter, outLetter)
 	}
 	// PLUGBOARD
 	inLetter = outLetter
 	outLetter = enigma.plugboard.Map(inLetter)
-	fmt.Printf("PB(2): %c -> %c\n", inLetter, outLetter)
+	// fmt.Printf("PB(2): %c -> %c\n", inLetter, outLetter)
 
 	return outLetter
 }
@@ -124,7 +116,6 @@ func (enigma *Enigma) EncipherString(input string) string {
 		} else {
 			newLtr = letter
 		}
-		fmt.Printf("%c => %c\n", letter, newLtr)
 		output += string(newLtr)
 	}
 
