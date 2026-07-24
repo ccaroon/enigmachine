@@ -2,8 +2,8 @@ package enigma
 
 type Rotor struct {
 	id       string
-	wiring   []int
-	inverse  []int
+	wiring   string
+	inverse  string
 	notch    int
 	position int
 }
@@ -16,20 +16,18 @@ type Rotor struct {
 func NewRotor(id string, wiring string, topLetter rune, notch rune) *Rotor {
 	rotor := &Rotor{
 		id:     id,
-		wiring: make([]int, 26),
+		wiring: wiring,
 		notch:  LetterToIdx(notch),
 	}
 
-	for inIdx, letter := range wiring {
-		rotor.wiring[inIdx] = LetterToIdx(letter)
-	}
+	// fmt.Println("\nWiring: ", wiring)
 
-	// Create inverse wirings for reverse/left-to-right operations
-	inverse := make([]int, 26)
-	for idx, outPos := range rotor.wiring {
-		inverse[outPos] = idx
+	inverse := make([]rune, 26)
+	for idx, letter := range wiring {
+		inverse[LetterToIdx(letter)] = IdxToLetter(idx)
 	}
-	rotor.inverse = inverse
+	rotor.inverse = string(inverse)
+	// fmt.Println("\nInverse: ", rotor.inverse)
 
 	rotor.SetTopLetter(topLetter)
 
@@ -59,7 +57,7 @@ func (rotor *Rotor) Id() string {
 	return rotor.id
 }
 
-func (rotor *Rotor) Wiring() []int {
+func (rotor *Rotor) Wiring() string {
 	return rotor.wiring
 }
 
@@ -92,61 +90,43 @@ func (rotor *Rotor) AtNotch() bool {
 // 	return IdxToLetter(outPos)
 // }
 
-func (rotor *Rotor) Fwd(inPos int) (int, rune) {
+func (rotor *Rotor) Forward(inPos int) (int, rune) {
 	adjPos := (inPos + rotor.position) % 26
 
-	result := rotor.wiring[adjPos]
-
 	// output_letter = self.wiring[(index + self.offset)%26]
-	outLtr := IdxToLetter(result)
+	// outLtr := rune(rotor.wiring[adjPos])
+
 	// output_index = (ALPHABET.index(output_letter) - self.offset)%26
-	outIdx := (result - rotor.position) % 26
+	// outIdx := (LetterToIdx(outLtr) - rotor.position) % 26
+	outIdx := (LetterToIdx(rune(rotor.wiring[adjPos])) - rotor.position) % 26
+	if outIdx < 0 {
+		outIdx = 26 + outIdx
+	}
 
-	return outIdx, outLtr
-}
-
-// func (rotor *Rotor) Fwd2(inPos int) RotorPosition {
-// 	adjPos := (inPos + rotor.position) % 26
-
-// 	result := rotor.wiring[adjPos]
-
-// 	// output_letter = self.wiring[(index + self.offset)%26]
-// 	outLtr := IdxToLetter(result)
-// 	// output_index = (ALPHABET.index(output_letter) - self.offset)%26
-// 	outIdx := (result - rotor.position) % 26
-
-// 	return RotorPosition{outIdx, outLtr}
-// }
-
-// func (rotor *Rotor) Forward(inPos int) int {
-// 	adjPos := (inPos + rotor.position) % 26
-
-// 	return rotor.wiring[adjPos]
-// }
-
-// Reverse | LeftToRight
-func (rotor *Rotor) LeftToRight(letter rune) rune {
-	inPos := LetterToIdx(letter)
-	outPos := rotor.Reverse(inPos)
-
-	return IdxToLetter(outPos)
+	return outIdx, IdxToLetter(outIdx)
 }
 
 // III(F): [1 3 5 7 9 11 2 15 17 19 23 21 25 13 24 4 8 22 6 0 10 12 20 18 16 14]
 // -------
 // III(R): [19 0 6 1 15 2 18 3 16 4 20 5 21 13 25 7 24 8 23 9 22 11 17 10 14 12]
-func (rotor *Rotor) Reverse(inPos int) int {
-	outPos := rotor.inverse[inPos]
-	adjOut := outPos + rotor.position
+func (rotor *Rotor) Reverse(inPos int) (int, rune) {
+	adjPos := (inPos + rotor.position) % 26
 
-	if adjOut < 0 {
-		// adjOut = 26 + adjOut%26
-		// E.g: 26 + -1 => 25
-		adjOut = 26 + adjOut
-		// fmt.Printf("\nWrap(%d): %d -> %d\n", rotor.position, inPos, adjOut)
+	// output_letter = self.inverse[(index + self.offset)%26]
+	// outLtr := rune(rotor.inverse[adjPos])
+
+	// output_index = (ALPHABET.index(output_letter) - self.offset)%26
+	// craig := LetterToIdx(outLtr) - rotor.position
+	// if craig < 0 {
+	// 	fmt.Printf("\nDEBUG => NEGATIVE IDX: %d | %d\n", craig, craig%26)
+	// }
+	// outIdx := (LetterToIdx(outLtr) - rotor.position) % 26
+	outIdx := (LetterToIdx(rune(rotor.inverse[adjPos])) - rotor.position) % 26
+	if outIdx < 0 {
+		outIdx = 26 + outIdx
 	}
 
-	// fmt.Printf("\n%d -> %d => %d\n", inPos, outPos, adjOut)
+	// fmt.Printf("\n%d: %d -> [%d|%d]\n", inPos, adjPos, outLtr, outIdx)
 
-	return adjOut + rotor.position
+	return outIdx, IdxToLetter(outIdx)
 }

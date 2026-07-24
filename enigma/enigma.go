@@ -1,7 +1,9 @@
 package enigma
 
 import (
+	"fmt"
 	"slices"
+	"strings"
 )
 
 type Enigma struct {
@@ -71,52 +73,60 @@ func (enigma *Enigma) Step() {
 	enigma.rotors[2].Step()
 }
 
-// func (enigma *Enigma) EncipherLetter(letter rune) rune {
-// 	var inLetter rune = letter
-// 	var outLetter rune
+func (enigma *Enigma) EncipherLetter(letter rune) rune {
+	var inLetter rune = letter
+	var outLetter rune
 
-// 	// ### FORWARD (right-to-left) ###
-// 	// PLUGBOARD
-// 	outLetter = enigma.plugboard.Map(inLetter)
-// 	fmt.Printf("\nPB(1): %c -> %c\n", inLetter, outLetter)
+	// ### FORWARD (right-to-left) ###
+	// PLUGBOARD
+	outLetter = enigma.plugboard.Map(inLetter)
+	outIdx := LetterToIdx(outLetter)
+	fmt.Printf("\nPB(1): %c -> %c\n", inLetter, outLetter)
 
-// 	// ROTORS
-// 	for idx := len(enigma.rotors) - 1; idx >= 0; idx-- {
-// 		rotor := enigma.rotors[idx]
-// 		inLetter = outLetter
-// 		outLetter = rotor.RightToLeft(inLetter)
-// 		fmt.Printf("Rotor%s(F): %c -> %c\n", rotor.Id(), inLetter, outLetter)
-// 	}
-// 	// REFLECTOR
-// 	inLetter = outLetter
-// 	outLetter = enigma.reflector.Reflect(inLetter)
-// 	fmt.Printf("Refl%s: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
+	// ROTORS
+	for idx := len(enigma.rotors) - 1; idx >= 0; idx-- {
+		rotor := enigma.rotors[idx]
+		inIdx := outIdx
+		outIdx, outLetter = rotor.Forward(inIdx)
+		fmt.Printf("Rotor%s(F): %c -> %c\n", rotor.Id(), inLetter, outLetter)
+	}
+	// REFLECTOR
+	inLetter = outLetter
+	outLetter = enigma.reflector.Reflect(inLetter)
+	outIdx = LetterToIdx(outLetter)
+	fmt.Printf("Refl%s: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
 
-// 	// ### REVERSE (left-to-right) ###
-// 	// ROTORS
-// 	for idx := 0; idx < len(enigma.rotors); idx++ {
-// 		rotor := enigma.rotors[idx]
-// 		inLetter = outLetter
-// 		outLetter = rotor.LeftToRight(inLetter)
-// 		fmt.Printf("Rotor%s(R): %c -> %c\n", rotor.Id(), inLetter, outLetter)
-// 	}
-// 	// PLUGBOARD
-// 	inLetter = outLetter
-// 	outLetter = enigma.plugboard.Map(inLetter)
-// 	fmt.Printf("PB(2): %c -> %c\n", inLetter, outLetter)
+	// ### REVERSE (left-to-right) ###
+	// ROTORS
+	for idx := 0; idx < len(enigma.rotors); idx++ {
+		rotor := enigma.rotors[idx]
+		inIdx := outIdx
+		outIdx, outLetter = rotor.Reverse(inIdx)
+		fmt.Printf("Rotor%s(R): %c -> %c\n", rotor.Id(), inLetter, outLetter)
+	}
+	// PLUGBOARD
+	inLetter = outLetter
+	outLetter = enigma.plugboard.Map(inLetter)
+	fmt.Printf("PB(2): %c -> %c\n", inLetter, outLetter)
 
-// 	return outLetter
-// }
+	return outLetter
+}
 
-// func (enigma *Enigma) EncipherString(input string) string {
-// 	var output string
+func (enigma *Enigma) EncipherString(input string) string {
+	var newLtr rune
+	var output string
 
-// 	for _, letter := range input {
-// 		enigma.Step()
-// 		newLtr := enigma.EncipherLetter(letter)
-// 		fmt.Printf("%c => %c\n", letter, newLtr)
-// 		output += string(newLtr)
-// 	}
+	for _, letter := range input {
+		inLtr := rune(strings.ToUpper(string(letter))[0])
+		if strings.ContainsRune(ALPHABET, inLtr) {
+			enigma.Step()
+			newLtr = enigma.EncipherLetter(inLtr)
+		} else {
+			newLtr = letter
+		}
+		fmt.Printf("%c => %c\n", letter, newLtr)
+		output += string(newLtr)
+	}
 
-// 	return output
-// }
+	return output
+}
