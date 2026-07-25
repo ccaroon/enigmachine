@@ -21,6 +21,8 @@ func NewRotor(id string, wiring string, topLetter rune, notch rune) *Rotor {
 	}
 	rotor.inverse = string(inverse)
 
+	// fmt.Printf("%s -> inverse -> %s\n", rotor.id, rotor.inverse)
+
 	rotor.SetTopLetter(topLetter)
 
 	return rotor
