@@ -8,8 +8,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "enigma",
-	Short:   "An AWS Secrets Manger CLI",
+	Use:     "enigmachine",
+	Short:   "An Enigma Machine Simulator",
 	Version: version, // See version.go
 	// PersistentPreRun: func(cmd *cobra.Command, args []string) {
 	// },
@@ -20,9 +20,6 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.SetVersionTemplate("{{.DisplayName }} v{{ .Version }}\n")
-	// rootCmd.AddCommand(
-	// 	encryptCmd,
-	// )
 }
 
 func handleCmdError(err error) {

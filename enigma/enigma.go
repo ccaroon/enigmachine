@@ -15,6 +15,7 @@ type Enigma struct {
 
 func NewEnigma(refId string, rotorIds []string, pbSpec []rune) *Enigma {
 	rotors := make([]*Rotor, len(rotorIds))
+	// TODO: check for duplicate rotors
 	for idx, rId := range rotorIds {
 		rotors[idx] = GetRotor(rId)
 	}
