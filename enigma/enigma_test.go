@@ -21,7 +21,7 @@ var _ = Describe("Enigma", func() {
 		machine := enigma.NewEnigma(
 			"B",
 			[]string{"I", "II", "III"},
-			[]rune{},
+			[]string{},
 		)
 
 		Expect(machine).ToNot(BeNil())
@@ -43,7 +43,7 @@ var _ = Describe("Enigma", func() {
 		machine := enigma.NewEnigma(
 			"B",
 			[]string{"I", "II", "III"},
-			[]rune{},
+			[]string{},
 		)
 
 		Expect(machine).ToNot(BeNil())
@@ -57,7 +57,7 @@ var _ = Describe("Enigma", func() {
 		machine := enigma.NewEnigma(
 			"B",
 			[]string{"III", "II", "I"},
-			[]rune{},
+			[]string{},
 		)
 
 		machine.ConfigureRotors("ABC")
@@ -71,7 +71,7 @@ var _ = Describe("Enigma", func() {
 		machine := enigma.NewEnigma(
 			"B",
 			[]string{"III", "II", "I"},
-			[]rune{},
+			[]string{},
 		)
 
 		machine.ConfigureRotors("KDO")
@@ -94,7 +94,7 @@ var _ = Describe("Enigma", func() {
 			machine := enigma.NewEnigma(
 				"B",
 				[]string{"I", "II", "III"},
-				[]rune{},
+				[]string{},
 			)
 
 			Expect(machine).ToNot(BeNil())
@@ -118,7 +118,7 @@ var _ = Describe("Enigma", func() {
 			machine := enigma.NewEnigma(
 				"B",
 				[]string{"I", "II", "III"},
-				[]rune{},
+				[]string{},
 			)
 
 			Expect(machine).ToNot(BeNil())
@@ -197,7 +197,7 @@ var _ = Describe("Enigma", func() {
 			machine := enigma.NewEnigma(
 				"B",
 				[]string{"I", "II", "III"},
-				[]rune{},
+				[]string{},
 			)
 
 			machine.ConfigureRotors("AAA")
@@ -243,7 +243,7 @@ var _ = Describe("Enigma", func() {
 			machine := enigma.NewEnigma(
 				"B",
 				[]string{"I", "II", "III"},
-				[]rune{},
+				[]string{},
 			)
 
 			machine.ConfigureRotors("AAB")
@@ -263,7 +263,7 @@ var _ = Describe("Enigma", func() {
 			machine := enigma.NewEnigma(
 				"B",
 				[]string{"I", "II", "III"},
-				[]rune{},
+				[]string{},
 			)
 
 			fmt.Println()
@@ -288,7 +288,7 @@ var _ = Describe("Enigma", func() {
 			machine := enigma.NewEnigma(
 				"B",
 				[]string{"I", "II", "III"},
-				[]rune{'A', 'Z'},
+				[]string{"AZ"},
 			)
 			// machine.ToggleTrace()
 			machine.ConfigureRotors("FUN")

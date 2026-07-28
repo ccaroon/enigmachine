@@ -23,15 +23,15 @@ var encodeCmd = &cobra.Command{
 			key.RotorIds,
 			key.PbSpec,
 		)
+		machine.ConfigureRotors(key.RotorCfg)
 
 		output := machine.EncipherString(input)
 		fmt.Println(output)
-
 	},
 }
 
 func init() {
-	encodeCmd.Flags().StringVarP(&keyFlag, "key", "k", "B:I,II,III:", "Key/Configuration to use to encode the message. E.g. B:I,II,II:AZ,QR,XM")
+	encodeCmd.Flags().StringVarP(&keyFlag, "key", "k", "B:I,II,III:", "Key/Configuration to use to encode the message. E.g. B:I@F,II,II@X:AZ,QR,XM")
 
 	rootCmd.AddCommand(encodeCmd)
 }

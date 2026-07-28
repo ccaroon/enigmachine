@@ -11,18 +11,18 @@ var _ = Describe("Plugboard", func() {
 	var pb *enigma.Plugboard
 
 	BeforeEach(func() {
-		cablePairs := []rune{
-			'K', 'Z',
-			'X', 'G',
-			'O', 'I',
-			'A', 'B',
+		cablePairs := []string{
+			"KZ",
+			"XG",
+			"OI",
+			"AB",
 		}
 		pb = enigma.NewPlugboard(cablePairs)
 	})
 
 	Context("Creation", func() {
 		It("Should be able to create an 'empty' plugboard", func() {
-			pb2 := enigma.NewPlugboard([]rune{})
+			pb2 := enigma.NewPlugboard([]string{})
 
 			Expect(pb2.NumCables()).To(Equal(0))
 			Expect(pb2.GetCable(0)).To(BeNil())
@@ -44,11 +44,11 @@ var _ = Describe("Plugboard", func() {
 		})
 
 		It("Should create a valid plugboard given uneven cable pairings", func() {
-			cablePairs := []rune{
-				'A', 'Z',
-				'F', 'X',
+			cablePairs := []string{
+				"AZ",
+				"FX",
 				// dangling/unconnected
-				'M',
+				"M",
 			}
 			pb2 := enigma.NewPlugboard(cablePairs)
 

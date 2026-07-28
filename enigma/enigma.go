@@ -13,7 +13,7 @@ type Enigma struct {
 	trace     bool
 }
 
-func NewEnigma(refId string, rotorIds []string, pbSpec []rune) *Enigma {
+func NewEnigma(refId string, rotorIds []string, pbSpec []string) *Enigma {
 	rotors := make([]*Rotor, len(rotorIds))
 	// TODO: check for duplicate rotors
 	for idx, rId := range rotorIds {

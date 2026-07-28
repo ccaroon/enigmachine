@@ -4,27 +4,22 @@ type Plugboard struct {
 	connections []Cable
 }
 
-func NewPlugboard(connSpec []rune) *Plugboard {
-	var specLen = len(connSpec)
-
-	// Should be an even number of letters
-	// If not, then we have an unconnected, dangling cable...ignore it.
-	if specLen%2 != 0 {
-		specLen -= 1
-		connSpec = connSpec[0:specLen]
-	}
-
+func NewPlugboard(connSpec []string) *Plugboard {
 	// TODO: Error handling
 	// * can't plug more than 1 cable into any one letter socket
 
-	var numCables = specLen / 2
+	var numCables = len(connSpec)
 	var plugboard Plugboard = Plugboard{
 		connections: make([]Cable, 0, numCables),
 	}
 
-	for i := 0; i < specLen; i += 2 {
-		cable := Cable{Plug1: connSpec[i], Plug2: connSpec[i+1]}
-		plugboard.connections = append(plugboard.connections, cable)
+	for _, ltrPair := range connSpec {
+		// if less than 2 letters, then ignore
+		// if more than 2 letter, then ignore all after first two
+		if len(ltrPair) >= 2 {
+			cable := Cable{Plug1: rune(ltrPair[0]), Plug2: rune(ltrPair[1])}
+			plugboard.connections = append(plugboard.connections, cable)
+		}
 	}
 
 	return &plugboard
