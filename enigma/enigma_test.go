@@ -2,6 +2,7 @@ package enigma_test
 
 import (
 	"fmt"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -90,6 +91,9 @@ var _ = Describe("Enigma", func() {
 	})
 
 	Context("Enciphering", func() {
+		// Just keep original input format
+		outputOptions := enigma.NewOutputOptions(0, 0, true)
+
 		Specify("Single Letter: B | I,II,III | AAA | []", func() {
 			machine := enigma.NewEnigma(
 				"B",
@@ -203,36 +207,36 @@ var _ = Describe("Enigma", func() {
 			machine.ConfigureRotors("AAA")
 			input = "AAAAA"
 			expOutput = "BDZGO"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "CRAIG"
 			expOutput = "QCZQF"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 			// continue with existing rotor positions
 			input = "CATE"
 			expOutput = "MCRW"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "CATE"
 			expOutput = "QDHW"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "HELLO WORLD"
 			expOutput = "ILBDA AMTAZ"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "craig, cate"
 			expOutput = "QCZQF, MCRW"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "heLLo 42 World"
 			expOutput = "ILBDA 42 AMTAZ"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 
 		})
 
@@ -249,12 +253,12 @@ var _ = Describe("Enigma", func() {
 			machine.ConfigureRotors("AAB")
 			input = "PYTHON"
 			expOutput = "HWFMKR"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAB")
 			input = "this is the way the world ends"
 			expOutput = "ZTQB LV RTC CSZ ABN HRSFF PZMN"
-			Expect(machine.EncipherString(input)).To(Equal(expOutput), input)
+			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
 		})
 
 		It("Can encipher a string - Various", func() {
@@ -279,7 +283,7 @@ var _ = Describe("Enigma", func() {
 			}
 			for cfg, expOut := range tests {
 				machine.ConfigureRotors(cfg)
-				Expect(machine.EncipherString(input)).To(Equal(expOut), "%s) %s -> %s", cfg, input, expOut)
+				Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOut), "%s) %s -> %s", cfg, input, expOut)
 
 			}
 		})
@@ -292,8 +296,41 @@ var _ = Describe("Enigma", func() {
 			)
 			// machine.ToggleTrace()
 			machine.ConfigureRotors("FUN")
-			output := machine.EncipherString("YNGXQ")
+			output := machine.EncipherString("YNGXQ", outputOptions)
 			Expect(output).To(Equal("OCAML"))
+		})
+
+		It("Can format output by blocks & lines", func() {
+			options := enigma.NewOutputOptions(5, 7, false)
+			machine := enigma.NewEnigma(
+				"B",
+				[]string{"I", "II", "III"},
+				[]string{},
+			)
+			machine.ConfigureRotors("NIL")
+
+			input := `This is the way the world ends
+This is the way the world ends
+This is the way the world ends
+Not with a bang but a whimper.
+`
+
+			// OPGND XHVWJ KJNXS TZOMG YVFPK UFQMI ANRLF
+			// FZZNS JVCUV AKFOM YLFHC RCDHF JKPGF GSZTY
+			// MFCAA SMMJB AZWEC CDYXG AXMZH
+			output := machine.EncipherString(input, options)
+
+			lines := strings.Split(output, "\n")
+			Expect(len(lines)).To(Equal(3))
+
+			words := strings.Split(strings.Trim(lines[0], " "), " ")
+			Expect(len(words)).To(Equal(7))
+
+			words = strings.Split(strings.Trim(lines[1], " "), " ")
+			Expect(len(words)).To(Equal(7))
+
+			words = strings.Split(strings.Trim(lines[2], " "), " ")
+			Expect(len(words)).To(Equal(5))
 		})
 	})
 })

@@ -13,6 +13,12 @@ type Enigma struct {
 	trace     bool
 }
 
+type OutputOptions struct {
+	KeepOriginalFormatting bool
+	BlockSize              int
+	BlocksPerLine          int
+}
+
 func NewEnigma(refId string, rotorIds []string, pbSpec []string) *Enigma {
 	rotors := make([]*Rotor, len(rotorIds))
 	// TODO: check for duplicate rotors
@@ -24,6 +30,15 @@ func NewEnigma(refId string, rotorIds []string, pbSpec []string) *Enigma {
 		plugboard: NewPlugboard(pbSpec),
 		rotors:    rotors,
 		reflector: GetReflector(refId),
+	}
+}
+
+func NewOutputOptions(blockSize, lineSize int, keepOriginalFmt bool) OutputOptions {
+
+	return OutputOptions{
+		KeepOriginalFormatting: keepOriginalFmt,
+		BlockSize:              blockSize,
+		BlocksPerLine:          lineSize,
 	}
 }
 
@@ -120,8 +135,9 @@ func (enigma *Enigma) EncipherLetter(letter rune) rune {
 	return outLetter
 }
 
-func (enigma *Enigma) EncipherString(input string) string {
-	var newLtr rune
+func (enigma *Enigma) EncipherString(input string, options OutputOptions) string {
+	var numLetters int
+	var numBlocks int
 	var output string
 
 	for _, letter := range input {
@@ -129,11 +145,25 @@ func (enigma *Enigma) EncipherString(input string) string {
 		if strings.ContainsRune(ALPHABET, inLtr) {
 			enigma.Step()
 			enigma.printTrace("rotors")
-			newLtr = enigma.EncipherLetter(inLtr)
-		} else {
-			newLtr = letter
+			newLtr := enigma.EncipherLetter(inLtr)
+
+			if !options.KeepOriginalFormatting {
+				if numLetters >= options.BlockSize {
+					output += " "
+					numLetters = 0
+					numBlocks += 1
+				}
+				if numBlocks >= options.BlocksPerLine {
+					output += "\n"
+					numBlocks = 0
+				}
+				numLetters += 1
+			}
+
+			output += string(newLtr)
+		} else if options.KeepOriginalFormatting {
+			output += string(letter)
 		}
-		output += string(newLtr)
 	}
 
 	return output
