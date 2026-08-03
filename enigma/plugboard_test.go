@@ -11,18 +11,25 @@ var _ = Describe("Plugboard", func() {
 	var pb *enigma.Plugboard
 
 	BeforeEach(func() {
+		var err error
+
 		cablePairs := []string{
 			"KZ",
 			"XG",
 			"OI",
 			"AB",
 		}
-		pb = enigma.NewPlugboard(cablePairs)
+		pb, err = enigma.NewPlugboard(cablePairs)
+
+		Expect(pb).To(Not(BeNil()))
+		Expect(err).To(BeNil())
 	})
 
 	Context("Creation", func() {
 		It("Should be able to create an 'empty' plugboard", func() {
-			pb2 := enigma.NewPlugboard([]string{})
+			pb2, err := enigma.NewPlugboard([]string{})
+
+			Expect(err).To(BeNil())
 
 			Expect(pb2.NumCables()).To(Equal(0))
 			Expect(pb2.GetCable(0)).To(BeNil())
@@ -50,7 +57,8 @@ var _ = Describe("Plugboard", func() {
 				// dangling/unconnected
 				"M",
 			}
-			pb2 := enigma.NewPlugboard(cablePairs)
+			pb2, err := enigma.NewPlugboard(cablePairs)
+			Expect(err).To(BeNil())
 
 			Expect(pb2.NumCables()).To(Equal(2))
 
@@ -90,6 +98,19 @@ var _ = Describe("Plugboard", func() {
 			// unconnected
 			Expect(pb.Map('Q')).To(Equal('Q'))
 			Expect(pb.Map('J')).To(Equal('J'))
+		})
+	})
+
+	Context("Error Handling", func() {
+		It("Should not allow duplicate settings", func() {
+			pb, err := enigma.NewPlugboard([]string{
+				"AZ", "CN",
+				"MT", "ET", // Both contain 'T'
+			})
+
+			Expect(pb).To(BeNil())
+			Expect(err).To(Not(BeNil()))
+			Expect(err).To(MatchError("Duplicate Plugboard Setting: [ET] [MT]"))
 		})
 	})
 

@@ -1,13 +1,12 @@
 package enigma
 
+import "fmt"
+
 type Plugboard struct {
 	connections []Cable
 }
 
-func NewPlugboard(connSpec []string) *Plugboard {
-	// TODO: Error handling
-	// * can't plug more than 1 cable into any one letter socket
-
+func NewPlugboard(connSpec []string) (*Plugboard, error) {
 	var numCables = len(connSpec)
 	var plugboard Plugboard = Plugboard{
 		connections: make([]Cable, 0, numCables),
@@ -17,12 +16,22 @@ func NewPlugboard(connSpec []string) *Plugboard {
 		// if less than 2 letters, then ignore
 		// if more than 2 letter, then ignore all after first two
 		if len(ltrPair) >= 2 {
-			cable := Cable{Plug1: rune(ltrPair[0]), Plug2: rune(ltrPair[1])}
+			ltr1 := rune(ltrPair[0])
+			ltr2 := rune(ltrPair[1])
+
+			// Check for duplicate plug settings
+			for _, existingCable := range plugboard.connections {
+				if existingCable.ConnectedTo(ltr1) || existingCable.ConnectedTo(ltr2) {
+					return nil, fmt.Errorf("Duplicate Plugboard Setting: [%s] [%c%c]", ltrPair, existingCable.Plug1, existingCable.Plug2)
+				}
+			}
+
+			cable := Cable{Plug1: ltr1, Plug2: ltr2}
 			plugboard.connections = append(plugboard.connections, cable)
 		}
 	}
 
-	return &plugboard
+	return &plugboard, nil
 }
 
 func (pb *Plugboard) NumCables() int {

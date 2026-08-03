@@ -1,28 +1,32 @@
 package enigma
 
+import "fmt"
+
 type Reflector struct {
 	id     string
 	wiring string
 }
 
-func NewReflector(id, wiring string) *Reflector {
+func newReflector(id, wiring string) *Reflector {
 	return &Reflector{
 		id:     id,
 		wiring: wiring,
 	}
 }
 
-func GetReflector(id string) *Reflector {
+func GetReflector(id string) (*Reflector, error) {
 	var reflector *Reflector
 
 	switch id {
 	case "B":
-		reflector = NewReflector("B", "YRUHQSLDPXNGOKMIEBFZCWVJAT")
+		reflector = newReflector("B", "YRUHQSLDPXNGOKMIEBFZCWVJAT")
 	case "C":
-		reflector = NewReflector("C", "FVPJIAOYEDRZXWGCTKUQSBNMHL")
+		reflector = newReflector("C", "FVPJIAOYEDRZXWGCTKUQSBNMHL")
+	default:
+		return nil, fmt.Errorf("Unsupported Reflector: '%s'", id)
 	}
 
-	return reflector
+	return reflector, nil
 }
 
 func (ref *Reflector) Id() string {

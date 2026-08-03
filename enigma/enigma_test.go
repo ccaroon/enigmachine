@@ -1,7 +1,6 @@
 package enigma_test
 
 import (
-	"fmt"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -17,16 +16,22 @@ func testRotorConfig(machine *enigma.Enigma, setting string) {
 }
 
 var _ = Describe("Enigma", func() {
+	var machine *enigma.Enigma
 
-	It("Can get a Rotor by Id", func() {
-		machine := enigma.NewEnigma(
+	BeforeEach(func() {
+		var err error
+
+		machine, err = enigma.NewEnigma(
 			"B",
 			[]string{"I", "II", "III"},
 			[]string{},
 		)
 
+		Expect(err).To(BeNil())
 		Expect(machine).ToNot(BeNil())
+	})
 
+	It("Can get a Rotor by Id", func() {
 		rotor := machine.GetRotor("I")
 		Expect(rotor.Id()).To(Equal("I"))
 
@@ -41,25 +46,19 @@ var _ = Describe("Enigma", func() {
 	})
 
 	It("Can Get Rotor by Index", func() {
-		machine := enigma.NewEnigma(
-			"B",
-			[]string{"I", "II", "III"},
-			[]string{},
-		)
-
-		Expect(machine).ToNot(BeNil())
-
 		Expect(machine.GetRotorByIdx(0).Id()).To(Equal("I"))
 		Expect(machine.GetRotorByIdx(1).Id()).To(Equal("II"))
 		Expect(machine.GetRotorByIdx(2).Id()).To(Equal("III"))
 	})
 
 	It("Can set starting config for Rotors", func() {
-		machine := enigma.NewEnigma(
+		machine, err := enigma.NewEnigma(
 			"B",
 			[]string{"III", "II", "I"},
 			[]string{},
 		)
+		Expect(err).To(BeNil())
+		Expect(machine).ToNot(BeNil())
 
 		machine.ConfigureRotors("ABC")
 		testRotorConfig(machine, "ABC")
@@ -69,11 +68,13 @@ var _ = Describe("Enigma", func() {
 	})
 
 	It("Can properly step multiple rotors", func() {
-		machine := enigma.NewEnigma(
+		machine, err := enigma.NewEnigma(
 			"B",
 			[]string{"III", "II", "I"},
 			[]string{},
 		)
+		Expect(err).To(BeNil())
+		Expect(machine).ToNot(BeNil())
 
 		machine.ConfigureRotors("KDO")
 		expected := []string{"KDO", "KDP", "KDQ", "KER", "LFS", "LFT", "LFU"}
@@ -95,14 +96,6 @@ var _ = Describe("Enigma", func() {
 		outputOptions := enigma.NewOutputOptions(0, 0, true)
 
 		Specify("Single Letter: B | I,II,III | AAA | []", func() {
-			machine := enigma.NewEnigma(
-				"B",
-				[]string{"I", "II", "III"},
-				[]string{},
-			)
-
-			Expect(machine).ToNot(BeNil())
-
 			// A -> U
 			outLetter := machine.EncipherLetter('A')
 			Expect(outLetter).To(Equal('U'))
@@ -119,14 +112,6 @@ var _ = Describe("Enigma", func() {
 		})
 
 		Specify("Single Letter: B | I,II,III | AAB | []", func() {
-			machine := enigma.NewEnigma(
-				"B",
-				[]string{"I", "II", "III"},
-				[]string{},
-			)
-
-			Expect(machine).ToNot(BeNil())
-
 			machine.ConfigureRotors("AAB")
 
 			// A -> B
@@ -144,65 +129,9 @@ var _ = Describe("Enigma", func() {
 			Expect(outLetter).To(Equal('G'))
 		})
 
-		// It("Can encipher a single letter with stepping", func() {
-		// 	machine := enigma.NewEnigma(
-		// 		"B",
-		// 		[]string{"I", "II", "III"},
-		// 		[]rune{},
-		// 	)
-
-		// 	Expect(machine).ToNot(BeNil())
-
-		// 	// Step/Rotate III
-		// 	rotorIII := machine.GetRotor("III")
-		// 	Expect(rotorIII.Id()).To(Equal("III"))
-		// 	rotorIII.Step()
-
-		// 	outLetter := machine.EncipherLetter('A')
-		// 	Expect(outLetter).To(Equal(byte('B')))
-		// 	// reciprocal
-		// 	outLetter = machine.EncipherLetter('B')
-		// 	Expect(outLetter).To(Equal(byte('A')))
-
-		// 	outLetter = machine.EncipherLetter('G')
-		// 	Expect(outLetter).To(Equal(byte('X')))
-		// 	// reciprocal
-		// 	outLetter = machine.EncipherLetter('X')
-		// 	Expect(outLetter).To(Equal(byte('G')))
-		// })
-
-		// It("Can encipher FUN letters", func() {
-		// 	machine := enigma.NewEnigma(
-		// 		"B",
-		// 		[]string{"I", "II", "III"},
-		// 		[]rune{},
-		// 	)
-		// 	machine.ConfigureRotors("FUM")
-
-		// 	rotorI := machine.GetRotor("I")
-		// 	Expect(rotorI.GetTopLetter()).To(Equal('F'))
-
-		// 	rotorII := machine.GetRotor("II")
-		// 	Expect(rotorII.GetTopLetter()).To(Equal('U'))
-
-		// 	rotorIII := machine.GetRotor("III")
-		// 	Expect(rotorIII.GetTopLetter()).To(Equal('M'))
-
-		// 	machine.Step()
-		// 	outLetter := machine.EncipherLetter('A')
-		// 	Expect(outLetter).To(Equal('Y'), "FUN(Y): Got [%c]", outLetter)
-
-		// })
-
 		It("Can encipher a string - AAA", func() {
 			var input string
 			var expOutput string
-
-			machine := enigma.NewEnigma(
-				"B",
-				[]string{"I", "II", "III"},
-				[]string{},
-			)
 
 			machine.ConfigureRotors("AAA")
 			input = "AAAAA"
@@ -244,12 +173,6 @@ var _ = Describe("Enigma", func() {
 			var input string
 			var expOutput string
 
-			machine := enigma.NewEnigma(
-				"B",
-				[]string{"I", "II", "III"},
-				[]string{},
-			)
-
 			machine.ConfigureRotors("AAB")
 			input = "PYTHON"
 			expOutput = "HWFMKR"
@@ -264,13 +187,6 @@ var _ = Describe("Enigma", func() {
 		It("Can encipher a string - Various", func() {
 			var input string
 
-			machine := enigma.NewEnigma(
-				"B",
-				[]string{"I", "II", "III"},
-				[]string{},
-			)
-
-			fmt.Println()
 			input = "PYTHON"
 			tests := map[string]string{
 				"AAA": "LMHKAE",
@@ -289,11 +205,14 @@ var _ = Describe("Enigma", func() {
 		})
 
 		It("Ocaml FUN", func() {
-			machine := enigma.NewEnigma(
+			machine, err := enigma.NewEnigma(
 				"B",
 				[]string{"I", "II", "III"},
 				[]string{"AZ"},
 			)
+			Expect(err).To(BeNil())
+			Expect(machine).ToNot(BeNil())
+
 			// machine.ToggleTrace()
 			machine.ConfigureRotors("FUN")
 			output := machine.EncipherString("YNGXQ", outputOptions)
@@ -302,11 +221,6 @@ var _ = Describe("Enigma", func() {
 
 		It("Can format output by blocks & lines", func() {
 			options := enigma.NewOutputOptions(5, 7, false)
-			machine := enigma.NewEnigma(
-				"B",
-				[]string{"I", "II", "III"},
-				[]string{},
-			)
 			machine.ConfigureRotors("NIL")
 
 			input := `This is the way the world ends
@@ -331,6 +245,41 @@ Not with a bang but a whimper.
 
 			words = strings.Split(strings.Trim(lines[2], " "), " ")
 			Expect(len(words)).To(Equal(5))
+		})
+	})
+
+	Context("Error Handling", func() {
+		It("Cannot use unknown Reflector", func() {
+			machine, err := enigma.NewEnigma(
+				"X",
+				[]string{"I", "II", "III"},
+				[]string{},
+			)
+
+			Expect(machine).To(BeNil())
+			Expect(err).To(MatchError("Unsupported Reflector: 'X'"))
+		})
+
+		It("Cannot contain duplicate rotors", func() {
+			machine, err := enigma.NewEnigma(
+				"B",
+				[]string{"I", "I", "III"},
+				[]string{},
+			)
+
+			Expect(machine).To(BeNil())
+			Expect(err).To(MatchError("Duplicate Rotors Detected: [I @ 1]"))
+		})
+
+		It("Cannot contain duplicate plugboard settings", func() {
+			machine, err := enigma.NewEnigma(
+				"B",
+				[]string{"I", "II", "III"},
+				[]string{"XC", "QW", "ER", "CX"},
+			)
+
+			Expect(machine).To(BeNil())
+			Expect(err).To(MatchError("Duplicate Plugboard Setting: [CX] [XC]"))
 		})
 	})
 })

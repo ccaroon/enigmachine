@@ -28,11 +28,12 @@ var encodeCmd = &cobra.Command{
 		key, err := enigma.ParseKeySpec(keyFlag)
 		handleCmdError(err)
 
-		machine := enigma.NewEnigma(
+		machine, err := enigma.NewEnigma(
 			key.ReflId,
 			key.RotorIds,
 			key.PbSpec,
 		)
+		handleCmdError(err)
 		machine.ConfigureRotors(key.RotorCfg)
 
 		if strings.HasPrefix(input, "@") {

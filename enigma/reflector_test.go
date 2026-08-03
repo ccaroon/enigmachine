@@ -9,14 +9,16 @@ import (
 var _ = Describe("Reflector", func() {
 
 	It("Can get the ID", func() {
-		refB := enigma.GetReflector("B")
+		refB, err := enigma.GetReflector("B")
+		Expect(err).To(BeNil())
 		Expect(refB.Id()).To(Equal("B"))
 	})
 
 	// YRUHQSLDPXNGOKMIEBFZCWVJAT
 	It("Should properly map all valid inputs", func() {
-		refB := enigma.GetReflector("B")
+		refB, err := enigma.GetReflector("B")
 
+		Expect(err).To(BeNil())
 		Expect(refB.Reflect('A')).To(Equal('Y'))
 		Expect(refB.Reflect('Z')).To(Equal('T'))
 
@@ -29,9 +31,18 @@ var _ = Describe("Reflector", func() {
 	})
 
 	It("Should be symmetrical: A->F <=> F->A", func() {
-		refC := enigma.GetReflector("C")
+		refC, err := enigma.GetReflector("C")
 
+		Expect(err).To(BeNil())
 		Expect(refC.Reflect('A')).To(Equal('F'))
 		Expect(refC.Reflect('F')).To(Equal('A'))
 	})
+
+	It("Cannot Get an unknown reflector", func() {
+		ref, err := enigma.GetReflector("X")
+
+		Expect(ref).To(BeNil())
+		Expect(err).To(MatchError("Unsupported Reflector: 'X'"))
+	})
+
 })

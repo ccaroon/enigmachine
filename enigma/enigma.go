@@ -19,18 +19,37 @@ type OutputOptions struct {
 	BlocksPerLine          int
 }
 
-func NewEnigma(refId string, rotorIds []string, pbSpec []string) *Enigma {
+func NewEnigma(refId string, rotorIds []string, pbSpec []string) (*Enigma, error) {
+	// Rotors
 	rotors := make([]*Rotor, len(rotorIds))
-	// TODO: check for duplicate rotors
+	rotorMap := make(map[string]any, len(rotorIds))
 	for idx, rId := range rotorIds {
+		// Check for duplicate rotors
+		if _, exists := rotorMap[rId]; exists {
+			return nil, fmt.Errorf("Duplicate Rotors Detected: [%s @ %d]", rId, idx)
+		}
+		rotorMap[rId] = struct{}{}
+
 		rotors[idx] = GetRotor(rId)
 	}
 
-	return &Enigma{
-		plugboard: NewPlugboard(pbSpec),
-		rotors:    rotors,
-		reflector: GetReflector(refId),
+	// Plugboard
+	plugboard, err := NewPlugboard(pbSpec)
+	if err != nil {
+		return nil, err
 	}
+
+	// Reflector
+	reflector, err := GetReflector(refId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Enigma{
+		plugboard: plugboard,
+		rotors:    rotors,
+		reflector: reflector,
+	}, nil
 }
 
 func NewOutputOptions(blockSize, lineSize int, keepOriginalFmt bool) OutputOptions {

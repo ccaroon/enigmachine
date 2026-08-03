@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2026.08.03
+* Added more of error handling
+
 ## 2026.08.01
 * Added Error handling to `ParseKeySpec()`
 * Added ability to encipher a file
