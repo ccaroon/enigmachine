@@ -4,25 +4,24 @@ type Rotor struct {
 	id       string
 	wiring   string
 	inverse  string
-	notch    byte
-	position byte
+	notch    int
+	position int
 }
 
-func NewRotor(id string, wiring string, topLetter byte, notch byte) *Rotor {
+func NewRotor(id string, wiring string, topLetter rune, notch rune) *Rotor {
 	rotor := &Rotor{
 		id:     id,
 		wiring: wiring,
-		notch:  notch,
+		notch:  LetterToIdx(notch),
 	}
 
-	// Create inverse wirings for "reverse" operations
-	inverse := make([]byte, 26)
-	for idx, letter := range rotor.wiring {
-		newIdx := LetterToIdx(byte(letter))
-		newLtr := IdxToLetter(byte(idx))
-		inverse[newIdx] = newLtr
+	inverse := make([]rune, 26)
+	for idx, letter := range wiring {
+		inverse[LetterToIdx(letter)] = IdxToLetter(idx)
 	}
 	rotor.inverse = string(inverse)
+
+	// fmt.Printf("%s -> inverse -> %s\n", rotor.id, rotor.inverse)
 
 	rotor.SetTopLetter(topLetter)
 
@@ -33,9 +32,6 @@ func GetRotor(id string) *Rotor {
 	var rotor *Rotor
 
 	switch id {
-	case "0":
-		// Identity Rotor
-		rotor = NewRotor("0", ALPHABET, 'A', 'Z')
 	case "I":
 		rotor = NewRotor("I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", 'A', 'Q')
 	case "II":
@@ -56,24 +52,14 @@ func (rotor *Rotor) Id() string {
 }
 
 func (rotor *Rotor) Wiring() string {
-	// Rotor Wiring adjusted for position/offset
-	adjWiring := rotor.wiring[rotor.position:] + rotor.wiring[0:rotor.position]
-
-	return adjWiring
+	return rotor.wiring
 }
 
-func (rotor *Rotor) InverseWiring() string {
-	// Rotor Inverse Wiring adjusted for position/offset
-	adjWiring := rotor.inverse[rotor.position:] + rotor.wiring[0:rotor.position]
-
-	return adjWiring
-}
-
-func (rotor *Rotor) SetTopLetter(letter byte) {
+func (rotor *Rotor) SetTopLetter(letter rune) {
 	rotor.position = LetterToIdx(letter)
 }
 
-func (rotor *Rotor) GetTopLetter() byte {
+func (rotor *Rotor) GetTopLetter() rune {
 	return IdxToLetter(rotor.position)
 }
 
@@ -83,41 +69,33 @@ func (rotor *Rotor) Step() {
 
 func (rotor *Rotor) AtNotch() bool {
 	atNotch := false
-	if IdxToLetter(rotor.position) == rotor.notch {
+	if rotor.position == rotor.notch {
 		atNotch = true
 	}
 
 	return atNotch
 }
 
-// Right to Left
-// ------
-// IO   -   ABCDEFGHIJKLMNOPQRSTUVWXYZ
-// III  -  BDFHJLCPRTXVZNYEIWGAKMUSQO
-// II   -   AJDKSIRUXBLHWTMCQGZNPYFVOE
-// ------
-func (rotor *Rotor) Forward(letter byte) byte {
-	idx := (LetterToIdx(letter) + rotor.position) % 26
-	return rotor.wiring[idx] - rotor.position
+func (rotor *Rotor) Forward(inPos int) (int, rune) {
+	adjPos := (inPos + rotor.position) % 26
+
+	outLtr := rune(rotor.wiring[adjPos])
+
+	outIdx := (LetterToIdx(outLtr) - rotor.position) % 26
+	if outIdx < 0 {
+		outIdx = 26 + outIdx
+	}
+
+	return outIdx, outLtr
 }
 
-// Left to Right
-// --------------------
-// func (rotor *Rotor) Reverse(letter byte) byte {
-// 	lIdx := strings.IndexByte(rotor.wiring, letter)
-// 	outPos := (byte(lIdx) + (26 - rotor.position)) % 26
+func (rotor *Rotor) Reverse(inPos int) (int, rune) {
+	adjPos := (inPos + rotor.position) % 26
 
-// 	outLetter := IdxToLetter(outPos)
+	outIdx := (LetterToIdx(rune(rotor.inverse[adjPos])) - rotor.position) % 26
+	if outIdx < 0 {
+		outIdx = 26 + outIdx
+	}
 
-//		return outLetter
-//	}
-//
-// --------------------
-func (rotor *Rotor) Reverse(letter byte) byte {
-	x := (LetterToIdx(letter) + rotor.position) % 26
-	y := LetterToIdx(rotor.inverse[x])
-	z := IdxToLetter((y - rotor.position) % 26)
-	return z
+	return outIdx, IdxToLetter(outIdx)
 }
-
-// EOF

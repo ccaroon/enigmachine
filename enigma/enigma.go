@@ -3,16 +3,25 @@ package enigma
 import (
 	"fmt"
 	"slices"
+	"strings"
 )
 
 type Enigma struct {
 	plugboard *Plugboard
 	rotors    []*Rotor
 	reflector *Reflector
+	trace     bool
 }
 
-func NewEnigma(refId string, rotorIds []string, pbSpec []byte) *Enigma {
+type OutputOptions struct {
+	KeepOriginalFormatting bool
+	BlockSize              int
+	BlocksPerLine          int
+}
+
+func NewEnigma(refId string, rotorIds []string, pbSpec []string) *Enigma {
 	rotors := make([]*Rotor, len(rotorIds))
+	// TODO: check for duplicate rotors
 	for idx, rId := range rotorIds {
 		rotors[idx] = GetRotor(rId)
 	}
@@ -22,6 +31,19 @@ func NewEnigma(refId string, rotorIds []string, pbSpec []byte) *Enigma {
 		rotors:    rotors,
 		reflector: GetReflector(refId),
 	}
+}
+
+func NewOutputOptions(blockSize, lineSize int, keepOriginalFmt bool) OutputOptions {
+
+	return OutputOptions{
+		KeepOriginalFormatting: keepOriginalFmt,
+		BlockSize:              blockSize,
+		BlocksPerLine:          lineSize,
+	}
+}
+
+func (enigma *Enigma) ToggleTrace() {
+	enigma.trace = !enigma.trace
 }
 
 func (enigma *Enigma) GetRotor(id string) *Rotor {
@@ -45,16 +67,9 @@ func (enigma *Enigma) GetRotorByIdx(idx int) *Rotor {
 
 func (enigma *Enigma) ConfigureRotors(startLetters string) {
 	for idx, letter := range startLetters {
-		enigma.rotors[idx].SetTopLetter(byte(letter))
+		enigma.rotors[idx].SetTopLetter(letter)
 	}
 }
-
-// func (enigma *Enigma) Step2() {
-// 	// Just before every letter is enciphered,
-// 	// if the top letter of any rotor *except the leftmost* is its turnover,
-// 	// then that rotor and the rotor to its left step.
-
-// }
 
 func (enigma *Enigma) Step() {
 	// TODO: Generalize to N rotors
@@ -62,62 +77,108 @@ func (enigma *Enigma) Step() {
 	// Assume 3 Rotors
 	// Check: Middle, then Right
 	if enigma.rotors[1].AtNotch() {
+		enigma.printTrace("-> Step Rotor %s\n", enigma.rotors[0].Id())
 		enigma.rotors[0].Step()
+
+		enigma.printTrace("-> Step Rotor %s\n", enigma.rotors[1].Id())
 		enigma.rotors[1].Step()
 	} else if enigma.rotors[2].AtNotch() {
+		enigma.printTrace("-> Step Rotor %s\n", enigma.rotors[1].Id())
 		enigma.rotors[1].Step()
 	}
 
 	// Always step Right
+	enigma.printTrace("-> Step Rotor %s\n", enigma.rotors[2].Id())
 	enigma.rotors[2].Step()
 }
 
-func (enigma *Enigma) EncipherLetter(letter byte) byte {
-	var inLetter byte = letter
-	var outLetter byte
+func (enigma *Enigma) EncipherLetter(letter rune) rune {
+	var inLetter rune = letter
+	var outLetter rune
 
 	// ### FORWARD (right-to-left) ###
 	// PLUGBOARD
 	outLetter = enigma.plugboard.Map(inLetter)
-	fmt.Printf("\nPB(1): %c -> %c\n", inLetter, outLetter)
+	outIdx := LetterToIdx(outLetter)
+	enigma.printTrace("PB(1): %c -> %c\n", inLetter, outLetter)
 
 	// ROTORS
 	for idx := len(enigma.rotors) - 1; idx >= 0; idx-- {
 		rotor := enigma.rotors[idx]
-		inLetter = outLetter
-		outLetter = rotor.Forward(inLetter)
-		fmt.Printf("Rotor%s(F): %c -> %c\n", rotor.Id(), inLetter, outLetter)
+		inIdx := outIdx
+		inLetter = IdxToLetter(inIdx)
+		outIdx, outLetter = rotor.Forward(inIdx)
+		enigma.printTrace("Rotor%s(F): %c -> %c\n", rotor.Id(), inLetter, outLetter)
 	}
+
 	// REFLECTOR
-	inLetter = outLetter
+	inLetter = IdxToLetter(outIdx)
 	outLetter = enigma.reflector.Reflect(inLetter)
-	fmt.Printf("Refl%s: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
+	outIdx = LetterToIdx(outLetter)
+	enigma.printTrace("Refl%s: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
 
 	// ### REVERSE (left-to-right) ###
 	// ROTORS
 	for idx := 0; idx < len(enigma.rotors); idx++ {
 		rotor := enigma.rotors[idx]
-		inLetter = outLetter
-		outLetter = rotor.Reverse(inLetter)
-		fmt.Printf("Rotor%s(R): %c -> %c\n", rotor.Id(), inLetter, outLetter)
+		inIdx := outIdx
+		inLetter = IdxToLetter(inIdx)
+		outIdx, outLetter = rotor.Reverse(inIdx)
+		enigma.printTrace("Rotor%s(R): %c -> %c\n", rotor.Id(), inLetter, outLetter)
 	}
+
 	// PLUGBOARD
 	inLetter = outLetter
 	outLetter = enigma.plugboard.Map(inLetter)
-	fmt.Printf("PB(2): %c -> %c\n", inLetter, outLetter)
+	enigma.printTrace("PB(2): %c -> %c\n", inLetter, outLetter)
 
 	return outLetter
 }
 
-func (enigma *Enigma) EncipherString(input string) string {
+func (enigma *Enigma) EncipherString(input string, options OutputOptions) string {
+	var numLetters int
+	var numBlocks int
 	var output string
 
 	for _, letter := range input {
-		enigma.Step()
-		newLtr := enigma.EncipherLetter(byte(letter))
-		fmt.Printf("%c => %c\n", letter, newLtr)
-		output += string(newLtr)
+		inLtr := rune(strings.ToUpper(string(letter))[0])
+		if strings.ContainsRune(ALPHABET, inLtr) {
+			enigma.Step()
+			enigma.printTrace("rotors")
+			newLtr := enigma.EncipherLetter(inLtr)
+
+			if !options.KeepOriginalFormatting {
+				if numLetters >= options.BlockSize {
+					output += " "
+					numLetters = 0
+					numBlocks += 1
+				}
+				if numBlocks >= options.BlocksPerLine {
+					output += "\n"
+					numBlocks = 0
+				}
+				numLetters += 1
+			}
+
+			output += string(newLtr)
+		} else if options.KeepOriginalFormatting {
+			output += string(letter)
+		}
 	}
 
 	return output
+}
+
+func (enigma *Enigma) printTrace(what string, args ...any) {
+	if enigma.trace {
+		switch what {
+		case "rotors":
+			lWindow := IdxToLetter(enigma.rotors[0].position)
+			mWindow := IdxToLetter(enigma.rotors[1].position)
+			rWindow := IdxToLetter(enigma.rotors[2].position)
+			fmt.Printf("%c-%c-%c\n", lWindow, mWindow, rWindow)
+		default:
+			fmt.Printf(what, args...)
+		}
+	}
 }

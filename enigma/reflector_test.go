@@ -7,26 +7,31 @@ import (
 )
 
 var _ = Describe("Reflector", func() {
+
+	It("Can get the ID", func() {
+		refB := enigma.GetReflector("B")
+		Expect(refB.Id()).To(Equal("B"))
+	})
+
 	// YRUHQSLDPXNGOKMIEBFZCWVJAT
 	It("Should properly map all valid inputs", func() {
 		refB := enigma.GetReflector("B")
 
-		Expect(refB.Reflect(byte('A'))).To(Equal(byte('Y')))
-		Expect(refB.Reflect(byte('Z'))).To(Equal(byte('T')))
+		Expect(refB.Reflect('A')).To(Equal('Y'))
+		Expect(refB.Reflect('Z')).To(Equal('T'))
 
 		for _, letter := range enigma.ALPHABET {
-			idx := enigma.LetterToIdx(byte(letter))
+			idx := enigma.LetterToIdx(letter)
 			outLetter := refB.Index(idx)
 
-			Expect(refB.Reflect(byte(letter))).To(Equal(outLetter))
+			Expect(refB.Reflect(letter)).To(Equal(outLetter))
 		}
 	})
 
 	It("Should be symmetrical: A->F <=> F->A", func() {
 		refC := enigma.GetReflector("C")
 
-		Expect(refC.Reflect(byte('A'))).To(Equal(byte('F')))
-		Expect(refC.Reflect(byte('F'))).To(Equal(byte('A')))
+		Expect(refC.Reflect('A')).To(Equal('F'))
+		Expect(refC.Reflect('F')).To(Equal('A'))
 	})
-
 })

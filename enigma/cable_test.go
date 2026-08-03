@@ -8,24 +8,22 @@ import (
 )
 
 var _ = Describe("Cable", func() {
-
 	It("Knows what letters it's connected to", func() {
 		cable := enigma.Cable{
-			Plug1: byte('D'),
-			Plug2: byte('X'),
+			Plug1: 'D',
+			Plug2: 'X',
 		}
 
-		Expect(cable.ConnectedTo(byte('D'))).To(BeTrue())
-		Expect(cable.ConnectedTo(byte('X'))).To(BeTrue())
+		Expect(cable.ConnectedTo('D')).To(BeTrue())
+		Expect(cable.ConnectedTo('X')).To(BeTrue())
 
-		Expect(cable.ConnectedTo(byte('A'))).To(BeFalse())
+		Expect(cable.ConnectedTo('A')).To(BeFalse())
 	})
 
 	It("Can follow plug1 to plug2", func() {
 		cable := enigma.NewCable('R', 'X')
 
-		Expect(cable.Follow('R')).To(Equal(byte('X')))
-		Expect(cable.Follow('X')).To(Equal(byte('R')))
+		Expect(cable.Follow('R')).To(Equal('X'))
+		Expect(cable.Follow('X')).To(Equal('R'))
 	})
-
 })

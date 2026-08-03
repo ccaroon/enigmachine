@@ -16,8 +16,6 @@ func GetReflector(id string) *Reflector {
 	var reflector *Reflector
 
 	switch id {
-	case "I": // "I"dentity Reflector
-		reflector = NewReflector("T", ALPHABET)
 	case "B":
 		reflector = NewReflector("B", "YRUHQSLDPXNGOKMIEBFZCWVJAT")
 	case "C":
@@ -31,12 +29,12 @@ func (ref *Reflector) Id() string {
 	return ref.id
 }
 
-func (ref *Reflector) Index(idx byte) byte {
-	return ref.wiring[idx]
+func (ref *Reflector) Index(idx int) rune {
+	return rune(ref.wiring[idx])
 }
 
-func (ref *Reflector) Reflect(letter byte) byte {
+func (ref *Reflector) Reflect(letter rune) rune {
 	inPos := LetterToIdx(letter)
 
-	return ref.wiring[inPos]
+	return rune(ref.wiring[inPos])
 }
