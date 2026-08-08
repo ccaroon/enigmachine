@@ -9,9 +9,17 @@ import (
 var _ = Describe("Reflector", func() {
 
 	It("Can get the ID", func() {
+		refA, err := enigma.GetReflector("A")
+		Expect(err).To(BeNil())
+		Expect(refA.Id()).To(Equal("A"))
+
 		refB, err := enigma.GetReflector("B")
 		Expect(err).To(BeNil())
 		Expect(refB.Id()).To(Equal("B"))
+
+		refC, err := enigma.GetReflector("C")
+		Expect(err).To(BeNil())
+		Expect(refC.Id()).To(Equal("C"))
 	})
 
 	// YRUHQSLDPXNGOKMIEBFZCWVJAT

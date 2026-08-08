@@ -18,6 +18,8 @@ func GetReflector(id string) (*Reflector, error) {
 	var reflector *Reflector
 
 	switch id {
+	case "A":
+		reflector = newReflector("A", "EJMZALYXVBWFCRQUONTSPIKHGD")
 	case "B":
 		reflector = newReflector("B", "YRUHQSLDPXNGOKMIEBFZCWVJAT")
 	case "C":

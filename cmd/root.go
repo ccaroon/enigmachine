@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ccaroon/enigmachine/keysheet"
 	"github.com/spf13/cobra"
 )
 
@@ -13,9 +14,12 @@ var rootCmd = &cobra.Command{
 	Version: version, // See version.go
 	// PersistentPreRun: func(cmd *cobra.Command, args []string) {
 	// },
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Printf("Target [%s]\n", config.Config.Target)
-	// },
+	Run: func(cmd *cobra.Command, args []string) {
+		entry := keysheet.GenerateEntry()
+		entry.Day = 8
+
+		entry.Print()
+	},
 }
 
 func init() {
