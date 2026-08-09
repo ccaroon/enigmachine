@@ -1,6 +1,9 @@
 # enigma
 An Enigma Machine Simulator
 
+## Dev Links
+* https://pkg.go.dev/github.com/bykof/gostradamus#section-readme
+
 ## Links
 * [Wikipedia Page](https://en.wikipedia.org/wiki/Enigma_machine)
 * [Wikipedia Rotor Details](https://en.wikipedia.org/wiki/Enigma_rotor_details)

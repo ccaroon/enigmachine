@@ -13,11 +13,10 @@ type Entry struct {
 	Day            int        `yaml:"day"`
 	Rotors         [3]string  `yaml:"rotors"`
 	RingSettings   [3]int     `yaml:"rings"`
+	Reflector      rune       `yaml:"reflector"`
 	PlugboardSwaps [10]string `yaml:"swaps"`
 	DayKeys        [4]string  `yaml:"day_keys"`
 }
-
-// type KeySheet [31]Entry // On Entry per Month Day
 
 // Generate an Entry
 func GenerateEntry() *Entry {
@@ -42,6 +41,12 @@ func GenerateEntry() *Entry {
 		}
 		rings[i] = num
 	}
+
+	// reflChoices := [3]rune{'A', 'B', 'C'}
+	// reflIdx := rand.IntN(len(reflChoices))
+	// reflector := reflChoices[reflIdx]
+	// TODO: Hard-coded...better way? What's the procedure?
+	reflector := 'B'
 
 	// Plugboard -- Choose 10 Letter Pairs; no letter used more than once
 	var swaps [10]string
@@ -81,6 +86,7 @@ func GenerateEntry() *Entry {
 	entry := Entry{
 		Rotors:         rotors,
 		RingSettings:   rings,
+		Reflector:      reflector,
 		PlugboardSwaps: swaps,
 		DayKeys:        dayKeys,
 	}
@@ -88,9 +94,15 @@ func GenerateEntry() *Entry {
 	return &entry
 }
 
-// Print an Entry
-func (entry *Entry) Print() {
-	rotors := strings.Join(entry.Rotors[:], " ")
+func (entry *Entry) Format() string {
+	rotors := fmt.Sprintf(
+		"%c %3s %3s %3s",
+		entry.Reflector,
+		entry.Rotors[0],
+		entry.Rotors[1],
+		entry.Rotors[2],
+	)
+
 	rings := fmt.Sprintf(
 		"%02d %02d %02d",
 		entry.RingSettings[0],
@@ -100,9 +112,10 @@ func (entry *Entry) Print() {
 	swaps := strings.Join(entry.PlugboardSwaps[:], " ")
 	dayKeys := strings.Join(entry.DayKeys[:], " ")
 
-	fmt.Printf("| %2d. | %v | %v | %v | %v |\n", entry.Day, rotors, rings, swaps, dayKeys)
+	return fmt.Sprintf("| %2d. | %s | %v | %v | %v |", entry.Day, rotors, rings, swaps, dayKeys)
 }
 
-// Generate a Monthly Key Sheet
-// Read a Key Sheet
-// Print a Key Sheet using ASCII with Headers, etc
+// Print an Entry
+func (entry *Entry) Print() {
+	fmt.Println(entry.Format())
+}

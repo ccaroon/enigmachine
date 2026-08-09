@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026.08.09
+* Added `key-sheet generate` command
+* 
+
 ## 2026.08.03
 * Added more of error handling
 

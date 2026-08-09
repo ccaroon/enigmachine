@@ -1,8 +1,6 @@
 package keysheet_test
 
 import (
-	"fmt"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -50,6 +48,13 @@ var _ = Describe("Entry", func() {
 			Expect(entry.RingSettings[1]).To(Not(Equal(entry.RingSettings[2])))
 		})
 
+		It("A Valid Reflector", func() {
+			entry := keysheet.GenerateEntry()
+			Expect(entry).To(Not(BeNil()))
+
+			Expect(entry.Reflector).To(Equal('B'))
+		})
+
 		It("Valid Plugboard Swaps", func() {
 			entry := keysheet.GenerateEntry()
 
@@ -70,8 +75,19 @@ var _ = Describe("Entry", func() {
 			for idx := range 4 {
 				Expect(entry.DayKeys[idx]).To(HaveLen(3))
 			}
-
-			fmt.Println(entry.DayKeys)
 		})
+	})
+
+	Context("Output", func() {
+		It("Can format an entry for printing", func() {})
+		entry := keysheet.GenerateEntry()
+		entry.Day = 27
+
+		Expect(entry).To(Not(BeNil()))
+
+		output := entry.Format()
+		Expect(output).To(Not(BeEmpty()))
+
+		Expect(output).To(ContainSubstring("27."))
 	})
 })
