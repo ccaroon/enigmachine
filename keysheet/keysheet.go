@@ -2,9 +2,11 @@ package keysheet
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/bykof/gostradamus"
+	"go.yaml.in/yaml/v3"
 )
 
 type KeySheet struct {
@@ -14,7 +16,6 @@ type KeySheet struct {
 	Entries [31]*Entry `yaml:"entries"`
 }
 
-// Generate a Monthly Key Sheet
 func GenerateKeySheet(network string, month, year int) *KeySheet {
 	targetDT := gostradamus.NewLocalDateTime(year, month, 1, 0, 0, 0, 0).CeilMonth()
 	numDays := targetDT.Day()
@@ -32,6 +33,19 @@ func GenerateKeySheet(network string, month, year int) *KeySheet {
 	}
 
 	return &keySheet
+}
+
+func LoadKeySheet(ksPath string) (*KeySheet, error) {
+	var keySheet KeySheet
+
+	content, err := os.ReadFile(ksPath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(content, &keySheet)
+
+	return &keySheet, nil
 }
 
 func (ks *KeySheet) Print() {
@@ -81,9 +95,16 @@ func (ks *KeySheet) Print() {
 
 }
 
-// TODO: Read a Key Sheet
+func (ks *KeySheet) Save(path string) error {
+	content, err := yaml.Marshal(ks)
+	if err != nil {
+		return err
+	}
 
-// TODO: Save a Key Sheet
-func (ks *KeySheet) Save(path string) {
+	err = os.WriteFile(path, content, 0644)
+	if err != nil {
+		return err
+	}
 
+	return nil
 }

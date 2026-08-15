@@ -6,6 +6,7 @@
   * [ ] config is an option for encode/decode
 * [x] Ability to encode a file
 * [ ] Day Keys vs Msg Keys
-* [ ] Code book
-  * [ ] generation
-  * [ ] integration
+* [ ] Key Sheet
+  * [x] generation
+  * [x] viewing / printing
+  * [ ] integration into cipher commands
