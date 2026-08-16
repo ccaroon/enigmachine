@@ -19,7 +19,7 @@ type OutputOptions struct {
 	BlocksPerLine          int
 }
 
-func NewEnigma(refId string, rotorIds []string, pbSpec []string) (*Enigma, error) {
+func NewEnigma(refId rune, rotorIds []string, pbSpec []string) (*Enigma, error) {
 	// Rotors
 	rotors := make([]*Rotor, len(rotorIds))
 	rotorMap := make(map[string]any, len(rotorIds))
@@ -134,7 +134,7 @@ func (enigma *Enigma) EncipherLetter(letter rune) rune {
 	inLetter = IdxToLetter(outIdx)
 	outLetter = enigma.reflector.Reflect(inLetter)
 	outIdx = LetterToIdx(outLetter)
-	enigma.printTrace("Refl%s: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
+	enigma.printTrace("Refl%c: %c -> %c\n", enigma.reflector.Id(), inLetter, outLetter)
 
 	// ### REVERSE (left-to-right) ###
 	// ROTORS

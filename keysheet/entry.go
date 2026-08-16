@@ -9,32 +9,35 @@ import (
 	"github.com/ccaroon/enigmachine/enigma"
 )
 
+const (
+	rotorCount  = 3
+	pbSwapCount = 10
+	dayKeyCount = 4
+)
+
 type Entry struct {
-	Day            int        `yaml:"day"`
-	Rotors         [3]string  `yaml:"rotors"`
-	RingSettings   [3]int     `yaml:"rings"`
-	Reflector      rune       `yaml:"reflector"`
-	PlugboardSwaps [10]string `yaml:"swaps"`
-	DayKeys        [4]string  `yaml:"day_keys"`
+	Day        int `yaml:"day"`
+	enigma.Key `yaml:"key"`
+	DayKeys    []string `yaml:"day_keys"`
 }
 
 // Generate an Entry
 func GenerateEntry() *Entry {
 
-	// Rotors -- Choose 3
-	var rotors [3]string
+	// Rotors
+	var rotors []string = make([]string, rotorCount)
 	rotorChoices := []string{"I", "II", "III", "IV", "V"}
 
-	for i := range 3 {
+	for i := range rotorCount {
 		idx := rand.IntN(len(rotorChoices))
 		rotors[i] = rotorChoices[idx]
 
 		rotorChoices = slices.Delete(rotorChoices, idx, idx+1)
 	}
 
-	// Ring Settings -- Choose 3 from (1-26)
-	var rings [3]int
-	for i := range 3 {
+	// Ring Settings -- Choose from (1-26)
+	var rings []int = make([]int, rotorCount)
+	for i := range rotorCount {
 		num := rand.IntN(25) + 1
 		for slices.Index(rings[:], num) != -1 {
 			num = rand.IntN(25) + 1
@@ -48,11 +51,11 @@ func GenerateEntry() *Entry {
 	// TODO: Hard-coded...better way? What's the procedure?
 	reflector := 'B'
 
-	// Plugboard -- Choose 10 Letter Pairs; no letter used more than once
-	var swaps [10]string
+	// Plugboard -- Choose Letter Pairs; no letter used more than once
+	var swaps []string = make([]string, pbSwapCount)
 	letters := []rune(enigma.ALPHABET)
 
-	for i := range 10 {
+	for i := range pbSwapCount {
 		idx1 := rand.IntN(len(letters))
 		ltr1 := letters[idx1]
 		letters = slices.Delete(letters, idx1, idx1+1)
@@ -64,13 +67,13 @@ func GenerateEntry() *Entry {
 		swaps[i] = fmt.Sprintf("%c%c", ltr1, ltr2)
 	}
 
-	// Rotor Top Letter Groups // Day Keys -- 4 Groups of 3 letters
+	// Rotor Top Letter Groups // Day Keys -- Groups of 3 letters
 	// Indivdual groups can contain the same letter
 	// Different groups can contain the same letters
 	// TODO: No two groups should be the same
-	var dayKeys [4]string
+	var dayKeys []string = make([]string, dayKeyCount)
 	letters = []rune(enigma.ALPHABET)
-	for i := range 4 {
+	for i := range dayKeyCount {
 		idx1 := rand.IntN(len(letters))
 		ltr1 := letters[idx1]
 
@@ -84,14 +87,22 @@ func GenerateEntry() *Entry {
 	}
 
 	entry := Entry{
-		Rotors:         rotors,
-		RingSettings:   rings,
-		Reflector:      reflector,
-		PlugboardSwaps: swaps,
-		DayKeys:        dayKeys,
+		Key: enigma.Key{
+			Rotors:         rotors,
+			RingSettings:   rings,
+			Reflector:      reflector,
+			PlugboardSwaps: swaps,
+		},
+		DayKeys: dayKeys,
 	}
 
 	return &entry
+}
+
+func (entry *Entry) RandomDayKey() string {
+	idx := rand.IntN(len(entry.DayKeys))
+
+	return entry.DayKeys[idx]
 }
 
 func (entry *Entry) Format() string {

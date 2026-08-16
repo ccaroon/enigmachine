@@ -3,9 +3,11 @@ package keysheet
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/bykof/gostradamus"
+	"github.com/ccaroon/enigmachine/util"
 	"go.yaml.in/yaml/v3"
 )
 
@@ -46,6 +48,32 @@ func LoadKeySheet(ksPath string) (*KeySheet, error) {
 	err = yaml.Unmarshal(content, &keySheet)
 
 	return &keySheet, nil
+}
+
+func LoadActiveKeySheet(network string) (*KeySheet, error) {
+	dt := gostradamus.Now()
+	ksPath := Path(network, dt.Month(), dt.Year())
+
+	return LoadKeySheet(ksPath)
+}
+
+func Path(network string, month, year int) string {
+	dataDir := util.GetDataDir()
+
+	re, err := regexp.Compile("\\W")
+	if err != nil {
+		panic(err)
+	}
+	sanitizedNetwork := re.ReplaceAllString(network, "_")
+
+	ksPath := fmt.Sprintf(
+		"%s/enigmachine/keysheets/%s/%d-%02d.yml",
+		dataDir, sanitizedNetwork,
+		year,
+		month,
+	)
+
+	return ksPath
 }
 
 func (ks *KeySheet) Print() {

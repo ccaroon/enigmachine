@@ -22,7 +22,7 @@ var _ = Describe("Enigma", func() {
 		var err error
 
 		machine, err = enigma.NewEnigma(
-			"B",
+			'B',
 			[]string{"I", "II", "III"},
 			[]string{},
 		)
@@ -53,7 +53,7 @@ var _ = Describe("Enigma", func() {
 
 	It("Can set starting config for Rotors", func() {
 		machine, err := enigma.NewEnigma(
-			"B",
+			'B',
 			[]string{"III", "II", "I"},
 			[]string{},
 		)
@@ -69,7 +69,7 @@ var _ = Describe("Enigma", func() {
 
 	It("Can properly step multiple rotors", func() {
 		machine, err := enigma.NewEnigma(
-			"B",
+			'B',
 			[]string{"III", "II", "I"},
 			[]string{},
 		)
@@ -206,7 +206,7 @@ var _ = Describe("Enigma", func() {
 
 		It("Ocaml FUN", func() {
 			machine, err := enigma.NewEnigma(
-				"B",
+				'B',
 				[]string{"I", "II", "III"},
 				[]string{"AZ"},
 			)
@@ -251,7 +251,7 @@ Not with a bang but a whimper.
 	Context("Error Handling", func() {
 		It("Cannot use unknown Reflector", func() {
 			machine, err := enigma.NewEnigma(
-				"X",
+				'X',
 				[]string{"I", "II", "III"},
 				[]string{},
 			)
@@ -262,7 +262,7 @@ Not with a bang but a whimper.
 
 		It("Cannot contain duplicate rotors", func() {
 			machine, err := enigma.NewEnigma(
-				"B",
+				'B',
 				[]string{"I", "I", "III"},
 				[]string{},
 			)
@@ -273,7 +273,7 @@ Not with a bang but a whimper.
 
 		It("Cannot contain duplicate plugboard settings", func() {
 			machine, err := enigma.NewEnigma(
-				"B",
+				'B',
 				[]string{"I", "II", "III"},
 				[]string{"XC", "QW", "ER", "CX"},
 			)

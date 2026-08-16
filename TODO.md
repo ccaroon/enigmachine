@@ -10,3 +10,6 @@
   * [x] generation
   * [x] viewing / printing
   * [ ] integration into cipher commands
+  * [ ] export & import
+* Move `alphabet.go` to separated package
+* More unit tests

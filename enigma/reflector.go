@@ -3,35 +3,35 @@ package enigma
 import "fmt"
 
 type Reflector struct {
-	id     string
+	id     rune
 	wiring string
 }
 
-func newReflector(id, wiring string) *Reflector {
+func newReflector(id rune, wiring string) *Reflector {
 	return &Reflector{
 		id:     id,
 		wiring: wiring,
 	}
 }
 
-func GetReflector(id string) (*Reflector, error) {
+func GetReflector(id rune) (*Reflector, error) {
 	var reflector *Reflector
 
 	switch id {
-	case "A":
-		reflector = newReflector("A", "EJMZALYXVBWFCRQUONTSPIKHGD")
-	case "B":
-		reflector = newReflector("B", "YRUHQSLDPXNGOKMIEBFZCWVJAT")
-	case "C":
-		reflector = newReflector("C", "FVPJIAOYEDRZXWGCTKUQSBNMHL")
+	case 'A':
+		reflector = newReflector('A', "EJMZALYXVBWFCRQUONTSPIKHGD")
+	case 'B':
+		reflector = newReflector('B', "YRUHQSLDPXNGOKMIEBFZCWVJAT")
+	case 'C':
+		reflector = newReflector('C', "FVPJIAOYEDRZXWGCTKUQSBNMHL")
 	default:
-		return nil, fmt.Errorf("Unsupported Reflector: '%s'", id)
+		return nil, fmt.Errorf("Unsupported Reflector: '%c'", id)
 	}
 
 	return reflector, nil
 }
 
-func (ref *Reflector) Id() string {
+func (ref *Reflector) Id() rune {
 	return ref.id
 }
 

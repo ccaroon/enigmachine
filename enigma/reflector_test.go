@@ -9,22 +9,22 @@ import (
 var _ = Describe("Reflector", func() {
 
 	It("Can get the ID", func() {
-		refA, err := enigma.GetReflector("A")
+		refA, err := enigma.GetReflector('A')
 		Expect(err).To(BeNil())
-		Expect(refA.Id()).To(Equal("A"))
+		Expect(refA.Id()).To(Equal('A'))
 
-		refB, err := enigma.GetReflector("B")
+		refB, err := enigma.GetReflector('B')
 		Expect(err).To(BeNil())
-		Expect(refB.Id()).To(Equal("B"))
+		Expect(refB.Id()).To(Equal('B'))
 
-		refC, err := enigma.GetReflector("C")
+		refC, err := enigma.GetReflector('C')
 		Expect(err).To(BeNil())
-		Expect(refC.Id()).To(Equal("C"))
+		Expect(refC.Id()).To(Equal('C'))
 	})
 
 	// YRUHQSLDPXNGOKMIEBFZCWVJAT
 	It("Should properly map all valid inputs", func() {
-		refB, err := enigma.GetReflector("B")
+		refB, err := enigma.GetReflector('B')
 
 		Expect(err).To(BeNil())
 		Expect(refB.Reflect('A')).To(Equal('Y'))
@@ -39,7 +39,7 @@ var _ = Describe("Reflector", func() {
 	})
 
 	It("Should be symmetrical: A->F <=> F->A", func() {
-		refC, err := enigma.GetReflector("C")
+		refC, err := enigma.GetReflector('C')
 
 		Expect(err).To(BeNil())
 		Expect(refC.Reflect('A')).To(Equal('F'))
@@ -47,7 +47,7 @@ var _ = Describe("Reflector", func() {
 	})
 
 	It("Cannot Get an unknown reflector", func() {
-		ref, err := enigma.GetReflector("X")
+		ref, err := enigma.GetReflector('X')
 
 		Expect(ref).To(BeNil())
 		Expect(err).To(MatchError("Unsupported Reflector: 'X'"))

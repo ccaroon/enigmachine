@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"regexp"
+	"path"
 	"strconv"
 	"strings"
 
@@ -11,17 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// var (
-// 	networkFlag string
-// 	monthFlag   int
-// 	yearFlag    int
-// )
-
 type KsArgs struct {
-	network          string
-	sanitizedNetwork string
-	month            int
-	year             int
+	network string
+	month   int
+	year    int
 }
 
 // Commands
@@ -39,17 +32,13 @@ var generateCmd = &cobra.Command{
 		handleCmdError(err)
 
 		network := ksArgs.network
-		safeNetwork := ksArgs.sanitizedNetwork
 		month := ksArgs.month
 		year := ksArgs.year
 
-		dataDir := getDataDir()
-		saveDir := fmt.Sprintf("%s/enigmachine/keysheets/%s", dataDir, safeNetwork)
-		saveFile := fmt.Sprintf("%d-%02d.yml", year, month)
-		savePath := saveDir + "/" + saveFile
+		ksFile := keysheet.Path(network, month, year)
 
 		var overwrite bool = true
-		_, err = os.Stat(savePath)
+		_, err = os.Stat(ksFile)
 		if err == nil {
 			overwrite = false
 
@@ -63,15 +52,15 @@ var generateCmd = &cobra.Command{
 		}
 
 		if overwrite {
-			err = os.MkdirAll(saveDir, 0755)
+			err = os.MkdirAll(path.Dir(ksFile), 0755)
 			handleCmdError(err)
 
 			keySheet := keysheet.GenerateKeySheet(network, month, year)
 
-			err = keySheet.Save(savePath)
+			err = keySheet.Save(ksFile)
 			handleCmdError(err)
 
-			fmt.Printf("Key Sheet Generated: %s\n", savePath)
+			fmt.Printf("Key Sheet Generated: %s\n", ksFile)
 		} else {
 			fmt.Println("Not overwriting existing Key Sheet!")
 		}
@@ -86,13 +75,10 @@ var viewCmd = &cobra.Command{
 		ksArgs, err := parseArgs(args)
 		handleCmdError(err)
 
-		dataDir := getDataDir()
-		ksFile := fmt.Sprintf(
-			"%s/enigmachine/keysheets/%s/%d-%02d.yml",
-			dataDir,
-			ksArgs.sanitizedNetwork,
-			ksArgs.year,
+		ksFile := keysheet.Path(
+			ksArgs.network,
 			ksArgs.month,
+			ksArgs.year,
 		)
 
 		keySheet, err := keysheet.LoadKeySheet(ksFile)
@@ -116,12 +102,7 @@ var viewCmd = &cobra.Command{
 func parseArgs(args []string) (*KsArgs, error) {
 	var ksArgs KsArgs
 
-	re, err := regexp.Compile("\\W")
-	if err != nil {
-		return nil, err
-	}
 	ksArgs.network = args[0]
-	ksArgs.sanitizedNetwork = re.ReplaceAllString(args[0], "_")
 
 	monthNum, err := strconv.Atoi(args[2])
 	if err != nil {
@@ -142,15 +123,6 @@ func parseArgs(args []string) (*KsArgs, error) {
 	ksArgs.year = yearNum
 
 	return &ksArgs, nil
-}
-
-func getDataDir() string {
-	dataHome := os.Getenv("XDG_DATA_HOME")
-	if dataHome == "" {
-		dataHome = os.ExpandEnv("$HOME/.local/share")
-	}
-
-	return dataHome
 }
 
 func init() {
