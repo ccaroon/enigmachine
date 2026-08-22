@@ -13,10 +13,11 @@ type Enigma struct {
 	trace     bool
 }
 
-type OutputOptions struct {
+type EnigmaOutput []string
+
+type FormatOptions struct {
 	KeepOriginalFormatting bool
 	BlockSize              int
-	BlocksPerLine          int
 }
 
 func NewEnigma(refId rune, rotorIds []string, pbSpec []string) (*Enigma, error) {
@@ -52,12 +53,11 @@ func NewEnigma(refId rune, rotorIds []string, pbSpec []string) (*Enigma, error) 
 	}, nil
 }
 
-func NewOutputOptions(blockSize, lineSize int, keepOriginalFmt bool) OutputOptions {
+func NewFormatOptions(blockSize int, keepOriginalFmt bool) FormatOptions {
 
-	return OutputOptions{
+	return FormatOptions{
 		KeepOriginalFormatting: keepOriginalFmt,
 		BlockSize:              blockSize,
-		BlocksPerLine:          lineSize,
 	}
 }
 
@@ -154,10 +154,10 @@ func (enigma *Enigma) EncipherLetter(letter rune) rune {
 	return outLetter
 }
 
-func (enigma *Enigma) EncipherString(input string, options OutputOptions) string {
+func (enigma *Enigma) EncipherString(input string, options FormatOptions) EnigmaOutput {
 	var numLetters int
-	var numBlocks int
-	var output string
+	var block string
+	var output EnigmaOutput
 
 	for _, letter := range input {
 		inLtr := rune(strings.ToUpper(string(letter))[0])
@@ -168,24 +168,40 @@ func (enigma *Enigma) EncipherString(input string, options OutputOptions) string
 
 			if !options.KeepOriginalFormatting {
 				if numLetters >= options.BlockSize {
-					output += " "
+					output = append(output, block)
+					block = ""
 					numLetters = 0
-					numBlocks += 1
-				}
-				if numBlocks >= options.BlocksPerLine {
-					output += "\n"
-					numBlocks = 0
 				}
 				numLetters += 1
 			}
 
-			output += string(newLtr)
+			block += string(newLtr)
 		} else if options.KeepOriginalFormatting {
-			output += string(letter)
+			block += string(letter)
 		}
 	}
 
+	output = append(output, block)
+
 	return output
+}
+
+func FormatOutput(output EnigmaOutput, blocksPerLine int) string {
+	var numBlocks int = len(output)
+	var formattedOutput string
+
+	for idx := 0; idx < numBlocks; idx += blocksPerLine {
+		start := idx
+		end := idx + blocksPerLine
+		if end > numBlocks {
+			end = numBlocks
+		}
+		formattedOutput += strings.Join(output[start:end], " ")
+		formattedOutput += "\n"
+	}
+
+	// return strings.Join(output, " ")
+	return formattedOutput
 }
 
 func (enigma *Enigma) printTrace(what string, args ...any) {
