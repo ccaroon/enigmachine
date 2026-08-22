@@ -36,7 +36,7 @@ var encodeCmd = &cobra.Command{
 		output := actions.EncodeDecode(actionArgs)
 
 		fmtOutput := enigma.FormatOutput(output, blocksPerLineFlag)
-		fmt.Println(fmtOutput)
+		fmt.Print(fmtOutput)
 	},
 }
 

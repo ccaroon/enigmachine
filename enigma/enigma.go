@@ -200,7 +200,6 @@ func FormatOutput(output EnigmaOutput, blocksPerLine int) string {
 		formattedOutput += "\n"
 	}
 
-	// return strings.Join(output, " ")
 	return formattedOutput
 }
 
