@@ -13,13 +13,6 @@ type Enigma struct {
 	trace     bool
 }
 
-type EnigmaOutput []string
-
-type FormatOptions struct {
-	KeepOriginalFormatting bool
-	BlockSize              int
-}
-
 func NewEnigma(refId rune, rotorIds []string, pbSpec []string) (*Enigma, error) {
 	// Rotors
 	rotors := make([]*Rotor, len(rotorIds))
@@ -51,14 +44,6 @@ func NewEnigma(refId rune, rotorIds []string, pbSpec []string) (*Enigma, error) 
 		rotors:    rotors,
 		reflector: reflector,
 	}, nil
-}
-
-func NewFormatOptions(blockSize int, keepOriginalFmt bool) FormatOptions {
-
-	return FormatOptions{
-		KeepOriginalFormatting: keepOriginalFmt,
-		BlockSize:              blockSize,
-	}
 }
 
 func (enigma *Enigma) ToggleTrace() {
@@ -154,10 +139,8 @@ func (enigma *Enigma) EncipherLetter(letter rune) rune {
 	return outLetter
 }
 
-func (enigma *Enigma) EncipherString(input string, options FormatOptions) EnigmaOutput {
-	var numLetters int
-	var block string
-	var output EnigmaOutput
+func (enigma *Enigma) EncipherString(input string, strict bool) EnigmaOutput {
+	var output strings.Builder
 
 	for _, letter := range input {
 		inLtr := rune(strings.ToUpper(string(letter))[0])
@@ -166,41 +149,13 @@ func (enigma *Enigma) EncipherString(input string, options FormatOptions) Enigma
 			enigma.printTrace("rotors")
 			newLtr := enigma.EncipherLetter(inLtr)
 
-			if !options.KeepOriginalFormatting {
-				if numLetters >= options.BlockSize {
-					output = append(output, block)
-					block = ""
-					numLetters = 0
-				}
-				numLetters += 1
-			}
-
-			block += string(newLtr)
-		} else if options.KeepOriginalFormatting {
-			block += string(letter)
+			output.WriteRune(newLtr)
+		} else if !strict {
+			output.WriteRune(letter)
 		}
 	}
 
-	output = append(output, block)
-
-	return output
-}
-
-func FormatOutput(output EnigmaOutput, blocksPerLine int) string {
-	var numBlocks int = len(output)
-	var formattedOutput string
-
-	for idx := 0; idx < numBlocks; idx += blocksPerLine {
-		start := idx
-		end := idx + blocksPerLine
-		if end > numBlocks {
-			end = numBlocks
-		}
-		formattedOutput += strings.Join(output[start:end], " ")
-		formattedOutput += "\n"
-	}
-
-	return formattedOutput
+	return EnigmaOutput(output.String())
 }
 
 func (enigma *Enigma) printTrace(what string, args ...any) {

@@ -92,9 +92,6 @@ var _ = Describe("Enigma", func() {
 	})
 
 	Context("Enciphering", func() {
-		// Just keep original input format
-		outputOptions := enigma.NewOutputOptions(0, 0, true)
-
 		Specify("Single Letter: B | I,II,III | AAA | []", func() {
 			// A -> U
 			outLetter := machine.EncipherLetter('A')
@@ -136,36 +133,43 @@ var _ = Describe("Enigma", func() {
 			machine.ConfigureRotors("AAA")
 			input = "AAAAA"
 			expOutput = "BDZGO"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			output := machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "CRAIG"
 			expOutput = "QCZQF"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			output = machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 			// continue with existing rotor positions
 			input = "CATE"
 			expOutput = "MCRW"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			output = machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "CATE"
 			expOutput = "QDHW"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			output = machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "HELLO WORLD"
-			expOutput = "ILBDA AMTAZ"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			expOutput = "ILBDAAMTAZ"
+			output = machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "craig, cate"
-			expOutput = "QCZQF, MCRW"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			expOutput = "QCZQFMCRW"
+			output = machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAA")
 			input = "heLLo 42 World"
-			expOutput = "ILBDA 42 AMTAZ"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			expOutput = "ILBDAAMTAZ"
+			output = machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 
 		})
 
@@ -176,12 +180,14 @@ var _ = Describe("Enigma", func() {
 			machine.ConfigureRotors("AAB")
 			input = "PYTHON"
 			expOutput = "HWFMKR"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			output := machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 
 			machine.ConfigureRotors("AAB")
 			input = "this is the way the world ends"
-			expOutput = "ZTQB LV RTC CSZ ABN HRSFF PZMN"
-			Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOutput), input)
+			expOutput = "ZTQBLVRTCCSZABNHRSFFPZMN"
+			output = machine.EncipherString(input, true)
+			Expect(output.String()).To(Equal(expOutput), input)
 		})
 
 		It("Can encipher a string - Various", func() {
@@ -199,7 +205,8 @@ var _ = Describe("Enigma", func() {
 			}
 			for cfg, expOut := range tests {
 				machine.ConfigureRotors(cfg)
-				Expect(machine.EncipherString(input, outputOptions)).To(Equal(expOut), "%s) %s -> %s", cfg, input, expOut)
+				output := machine.EncipherString(input, true)
+				Expect(output.String()).To(Equal(expOut), "%s) %s -> %s", cfg, input, expOut)
 
 			}
 		})
@@ -215,12 +222,50 @@ var _ = Describe("Enigma", func() {
 
 			// machine.ToggleTrace()
 			machine.ConfigureRotors("FUN")
-			output := machine.EncipherString("YNGXQ", outputOptions)
-			Expect(output).To(Equal("OCAML"))
+			output := machine.EncipherString("YNGXQ", true)
+			Expect(output.String()).To(Equal("OCAML"))
+		})
+	})
+
+	Context("Output Formatting", func() {
+
+		It("Can keep original input formatting", func() {
+			options := enigma.NewFormatOptions(0, 0, true)
+			machine.ConfigureRotors("FOO")
+
+			input := `This is the way the world ends
+This is the way the world ends
+This is the way the world ends
+Not with a bang but a whimper.`
+
+			// HVCE PX EMI PGK WDU STFSI LIUU
+			// ZUYG MN KLY REP PRW QXSNV YJZO
+			// EMJJ JT ELA UHV ACQ DYNWI XHMG
+			// GWC KRNV B GFFF NTW Q BZZBWOE.
+			encodedData := machine.EncipherString(input, false)
+			output := encodedData.Format(options)
+
+			lines := strings.Split(output, "\n")
+			Expect(len(lines)).To(Equal(4))
+
+			// Examine last line
+			blocks := strings.Split(lines[3], " ")
+			Expect(len(blocks)).To(Equal(7))
+
+			aWord := blocks[0]
+			Expect(len(aWord)).To(Equal(3))
+
+			aWord = blocks[2]
+			Expect(len(aWord)).To(Equal(1))
+
+			aWord = blocks[6]
+			Expect(len(aWord)).To(Equal(8))
+			Expect(aWord[7]).To(Equal(byte('.')))
+
 		})
 
 		It("Can format output by blocks & lines", func() {
-			options := enigma.NewOutputOptions(5, 7, false)
+			options := enigma.NewFormatOptions(5, 7, false)
 			machine.ConfigureRotors("NIL")
 
 			input := `This is the way the world ends
@@ -232,7 +277,8 @@ Not with a bang but a whimper.
 			// OPGND XHVWJ KJNXS TZOMG YVFPK UFQMI ANRLF
 			// FZZNS JVCUV AKFOM YLFHC RCDHF JKPGF GSZTY
 			// MFCAA SMMJB AZWEC CDYXG AXMZH
-			output := machine.EncipherString(input, options)
+			encodedData := machine.EncipherString(input, true)
+			output := encodedData.Format(options)
 
 			lines := strings.Split(output, "\n")
 			Expect(len(lines)).To(Equal(3))

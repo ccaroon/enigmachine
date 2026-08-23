@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ccaroon/enigmachine/actions"
-	"github.com/ccaroon/enigmachine/enigma"
 	"github.com/spf13/cobra"
 )
 
@@ -30,13 +29,12 @@ var encodeCmd = &cobra.Command{
 			Network:     networkFlag,
 			RotorCfg:    rotorCfgFlag,
 			BlockSize:   blockSizeFlag,
+			LineSize:    blocksPerLineFlag,
 			KeepOrigFmt: keepOrigFmtFlag,
 		}
 
 		output := actions.EncodeDecode(actionArgs)
-
-		fmtOutput := enigma.FormatOutput(output, blocksPerLineFlag)
-		fmt.Print(fmtOutput)
+		fmt.Println(output)
 	},
 }
 

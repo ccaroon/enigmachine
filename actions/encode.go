@@ -19,10 +19,11 @@ type EncodeDecodeArgs struct {
 	Network     string
 	RotorCfg    string
 	BlockSize   int
+	LineSize    int
 	KeepOrigFmt bool
 }
 
-func EncodeDecode(args EncodeDecodeArgs) enigma.EnigmaOutput {
+func EncodeDecode(args EncodeDecodeArgs) string {
 	var content string
 	var key *enigma.Key
 	var dayKey string
@@ -81,14 +82,15 @@ func EncodeDecode(args EncodeDecodeArgs) enigma.EnigmaOutput {
 	}
 	machine.ConfigureRotors(rotorCfg)
 
-	options := enigma.NewFormatOptions(args.BlockSize, args.KeepOrigFmt)
-	output := machine.EncipherString(content, options)
+	output := machine.EncipherString(content, !args.KeepOrigFmt)
 
 	if args.Network != "" && args.Action == "encode" {
-		dayKeyBlock := fmt.Sprintf("%s%s", enigma.RandomLetters(2), dayKey)
+		dayKeyBlock := fmt.Sprintf("%s%s", enigma.RandomLetters(args.BlockSize-len(dayKey)), dayKey)
 		// prepend the dayKeyBlock to the output
-		output = append(enigma.EnigmaOutput{dayKeyBlock}, output...)
+		output = enigma.EnigmaOutput(dayKeyBlock) + output
 	}
 
-	return output
+	options := enigma.NewFormatOptions(args.BlockSize, args.LineSize, args.KeepOrigFmt)
+
+	return output.Format(options)
 }
