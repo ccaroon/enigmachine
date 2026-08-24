@@ -68,7 +68,7 @@ func GenerateEntry() *Entry {
 	}
 
 	// Rotor Top Letter Groups // Day Keys -- Groups of 3 letters
-	// Indivdual groups can contain the same letter
+	// Individual groups can contain the same letter
 	// Different groups can contain the same letters
 	// TODO: No two groups should be the same
 	var dayKeys []string = make([]string, dayKeyCount)
@@ -105,7 +105,7 @@ func (entry *Entry) RandomDayKey() string {
 	return entry.DayKeys[idx]
 }
 
-func (entry *Entry) Format() string {
+func (entry *Entry) String() string {
 	rotors := fmt.Sprintf(
 		"%c %3s %3s %3s",
 		entry.Reflector,
@@ -128,5 +128,5 @@ func (entry *Entry) Format() string {
 
 // Print an Entry
 func (entry *Entry) Print() {
-	fmt.Println(entry.Format())
+	fmt.Println(entry.String())
 }

@@ -35,7 +35,7 @@ var generateCmd = &cobra.Command{
 		month := ksArgs.month
 		year := ksArgs.year
 
-		ksFile := keysheet.Path(network, month, year)
+		ksFile := keysheet.BuildPath(network, month, year)
 
 		var overwrite bool = true
 		_, err = os.Stat(ksFile)
@@ -75,7 +75,7 @@ var viewCmd = &cobra.Command{
 		ksArgs, err := parseArgs(args)
 		handleCmdError(err)
 
-		ksFile := keysheet.Path(
+		ksFile := keysheet.BuildPath(
 			ksArgs.network,
 			ksArgs.month,
 			ksArgs.year,

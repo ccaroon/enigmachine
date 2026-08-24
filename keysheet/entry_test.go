@@ -1,6 +1,8 @@
 package keysheet_test
 
 import (
+	"slices"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -78,6 +80,16 @@ var _ = Describe("Entry", func() {
 		})
 	})
 
+	Context("Usage", func() {
+		It("Can choose a random day key", func() {
+			entry := keysheet.GenerateEntry()
+			Expect(len(entry.DayKeys)).To(Not(BeZero()))
+
+			dayKey := entry.RandomDayKey()
+			Expect(slices.Contains(entry.DayKeys, dayKey)).To(BeTrue())
+		})
+	})
+
 	Context("Output", func() {
 		It("Can format an entry for printing", func() {})
 		entry := keysheet.GenerateEntry()
@@ -85,7 +97,7 @@ var _ = Describe("Entry", func() {
 
 		Expect(entry).To(Not(BeNil()))
 
-		output := entry.Format()
+		output := entry.String()
 		Expect(output).To(Not(BeEmpty()))
 
 		Expect(output).To(ContainSubstring("27."))

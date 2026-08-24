@@ -52,15 +52,15 @@ func LoadKeySheet(ksPath string) (*KeySheet, error) {
 
 func LoadActiveKeySheet(network string) (*KeySheet, error) {
 	dt := gostradamus.Now()
-	ksPath := Path(network, dt.Month(), dt.Year())
+	ksPath := BuildPath(network, dt.Month(), dt.Year())
 
 	return LoadKeySheet(ksPath)
 }
 
-func Path(network string, month, year int) string {
+func BuildPath(network string, month, year int) string {
 	dataDir := util.GetDataDir()
 
-	re, err := regexp.Compile("\\W")
+	re, err := regexp.Compile(`\W`)
 	if err != nil {
 		panic(err)
 	}
@@ -76,12 +76,14 @@ func Path(network string, month, year int) string {
 	return ksPath
 }
 
-func (ks *KeySheet) Print() {
+func (ks *KeySheet) String() string {
+	var output strings.Builder
+
 	dt := gostradamus.NewLocalDateTime(ks.Year, ks.Month, 1, 0, 0, 0, 0)
 	dtStamp := dt.Format("MMMM YYYY")
 
 	// Length of a line == Length of one entry
-	lineLen := len(ks.Entries[0].Format())
+	lineLen := len(ks.Entries[0].String())
 	divider := fmt.Sprintf("+%s+", strings.Repeat("-", lineLen-2))
 
 	// Header1
@@ -89,38 +91,55 @@ func (ks *KeySheet) Print() {
 	netLen := len(ks.Network)
 	h1Len := len(header1)
 	filler := strings.Repeat(" ", int(lineLen-(h1Len*2)-netLen)/2)
-	fmt.Printf("%s%s%s%s%s\n", header1, filler, strings.ToUpper(ks.Network), filler, header1)
+	output.WriteString(
+		fmt.Sprintf("%s%s%s%s%s\n", header1, filler, strings.ToUpper(ks.Network), filler, header1),
+	)
 
 	// Header2
 	header2 := "Achtung! Streng Geheim!"
 	h2Len := len(header2)
 	dtLen := len(dtStamp)
 	filler = strings.Repeat(" ", int(lineLen-(dtLen*2)-h2Len)/2)
-	fmt.Printf("%s%s%s%s%s\n", dtStamp, filler, header2, filler, dtStamp)
-
-	// Divider
-	fmt.Println(divider)
-
-	// Table Header
-	fmt.Printf("| %-3s | %-13s | %-8s | %-29s | %-15s |\n",
-		"Day",
-		"Rotors",
-		"Rings",
-		"Plugboard",
-		"Day Keys",
+	output.WriteString(
+		fmt.Sprintf("%s%s%s%s%s\n", dtStamp, filler, header2, filler, dtStamp),
 	)
 
 	// Divider
-	fmt.Println(divider)
+	output.WriteString(divider)
+	output.WriteString("\n")
+
+	// Table Header
+	output.WriteString(
+		fmt.Sprintf("| %-3s | %-13s | %-8s | %-29s | %-15s |\n",
+			"Day",
+			"Rotors",
+			"Rings",
+			"Plugboard",
+			"Day Keys",
+		),
+	)
+
+	// Divider
+	output.WriteString(divider)
+	output.WriteString("\n")
 
 	// Entries
 	for i := len(ks.Entries) - 1; i >= 0; i-- {
-		ks.Entries[i].Print()
+		output.WriteString(
+			ks.Entries[i].String(),
+		)
+		output.WriteString("\n")
 	}
 
 	// Footer / Final Divider
-	fmt.Println(divider)
+	output.WriteString(divider)
+	output.WriteString("\n")
 
+	return output.String()
+}
+
+func (ks *KeySheet) Print() {
+	fmt.Print(ks.String())
 }
 
 func (ks *KeySheet) Save(path string) error {
