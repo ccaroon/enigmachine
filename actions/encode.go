@@ -10,6 +10,7 @@ import (
 	"github.com/ccaroon/enigmachine/keysheet"
 )
 
+const defaultRotorCfg = "AAA"
 const defaultKeySpec = "B:I,II,III:"
 
 type EncodeDecodeArgs struct {
@@ -39,10 +40,9 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 		content = args.Input
 	}
 
-	if args.KeySpec != "" {
-		key, err = enigma.ParseKeySpec(args.KeySpec)
-		handleActionError(err)
-	} else if args.Network != "" {
+	// IF network -- get all config from Key Sheet
+	// ELSE -- get all config from cmd args
+	if args.Network != "" {
 		keySheet, err := keysheet.LoadActiveKeySheet(args.Network)
 		handleActionError(err)
 
@@ -63,9 +63,17 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 			// remove dayKey block
 			content = content[5:]
 		}
-
 	} else {
-		key, err = enigma.ParseKeySpec(defaultKeySpec)
+		dayKey := args.RotorCfg
+		if dayKey == "" {
+			dayKey = defaultRotorCfg
+		}
+
+		keySpec := args.KeySpec
+		if keySpec == "" {
+			keySpec = defaultKeySpec
+		}
+		key, err = enigma.ParseKeySpec(keySpec)
 		handleActionError(err)
 	}
 
@@ -76,11 +84,7 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 	)
 	handleActionError(err)
 
-	rotorCfg := dayKey
-	if args.RotorCfg != "" {
-		rotorCfg = strings.ToUpper(args.RotorCfg)
-	}
-	machine.ConfigureRotors(rotorCfg)
+	machine.ConfigureRotors(strings.ToUpper(dayKey))
 
 	output := machine.EncipherString(content, !args.KeepOrigFmt)
 
