@@ -33,7 +33,8 @@ var encodeCmd = &cobra.Command{
 			KeepOrigFmt: keepOrigFmtFlag,
 		}
 
-		output := actions.EncodeDecode(actionArgs)
+		output, err := actions.EncodeDecode(actionArgs)
+		handleCmdError(err)
 		fmt.Println(output)
 	},
 }

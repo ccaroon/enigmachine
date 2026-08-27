@@ -57,6 +57,12 @@ func LoadActiveKeySheet(network string) (*KeySheet, error) {
 	return LoadKeySheet(ksPath)
 }
 
+func (ks *KeySheet) ActiveEntry() *Entry {
+	now := gostradamus.Now()
+
+	return ks.Entries[now.Day()-1]
+}
+
 func BuildPath(network string, month, year int) string {
 	dataDir := util.GetDataDir()
 

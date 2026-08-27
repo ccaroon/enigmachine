@@ -24,7 +24,7 @@ type EncodeDecodeArgs struct {
 	KeepOrigFmt bool
 }
 
-func EncodeDecode(args EncodeDecodeArgs) string {
+func EncodeDecode(args EncodeDecodeArgs) (string, error) {
 	var content string
 	var key *enigma.Key
 	var dayKey string
@@ -33,7 +33,9 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 
 	if strings.HasPrefix(args.Input, "@") {
 		data, err := os.ReadFile(args.Input[1:])
-		handleActionError(err)
+		if err != nil {
+			return "", err
+		}
 
 		content = string(data)
 	} else {
@@ -44,7 +46,9 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 	// ELSE -- get all config from cmd args
 	if args.Network != "" {
 		keySheet, err := keysheet.LoadActiveKeySheet(args.Network)
-		handleActionError(err)
+		if err != nil {
+			return "", err
+		}
 
 		entry := keySheet.Entries[now.Day()-1]
 		key = &entry.Key
@@ -74,7 +78,9 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 			keySpec = defaultKeySpec
 		}
 		key, err = enigma.ParseKeySpec(keySpec)
-		handleActionError(err)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	machine, err := enigma.NewEnigma(
@@ -82,7 +88,9 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 		key.Rotors,
 		key.PlugboardSwaps,
 	)
-	handleActionError(err)
+	if err != nil {
+		return "", err
+	}
 
 	machine.ConfigureRotors(strings.ToUpper(dayKey))
 
@@ -96,5 +104,5 @@ func EncodeDecode(args EncodeDecodeArgs) string {
 
 	options := enigma.NewFormatOptions(args.BlockSize, args.LineSize, args.KeepOrigFmt)
 
-	return output.Format(options)
+	return output.Format(options), nil
 }
